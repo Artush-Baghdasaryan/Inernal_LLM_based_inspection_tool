@@ -1,0 +1,50 @@
+<div class="welcome-page">
+  <div class="animated-background">
+    <div class="floating-shapes">
+      @for (i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]; track i) {
+        <div class="shape" [class]="'shape-' + i" [style.animation-delay]="(i * 0.3) + 's'"></div>
+      }
+    </div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+  </div>
+  
+  <div class="welcome-content">
+    <div class="logo-container">
+      <div class="logo-wrapper">
+        <svg width="120" height="120" viewBox="0 0 120 120" class="logo-icon">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <circle cx="60" cy="60" r="55" fill="none" stroke="url(#logoGradient)" stroke-width="2" opacity="0.3"/>
+          <path d="M30 60 L50 40 L70 60 L50 80 Z" fill="url(#logoGradient)" opacity="0.8"/>
+          <circle cx="60" cy="60" r="15" fill="url(#logoGradient)"/>
+          <circle cx="60" cy="60" r="8" fill="#fff" opacity="0.9"/>
+        </svg>
+        <div class="logo-glow"></div>
+      </div>
+    </div>
+    
+    <h1 class="welcome-title">
+      <span class="title-line">Internal LLM-based</span>
+      <span class="title-line">Inspection Tool</span>
+    </h1>
+    
+    <p class="welcome-description">
+      Intelligent code analysis tool powered by LLM.<br/>
+      Upload your code or write from scratch, get detailed feedback and recommendations.
+    </p>
+    
+    <button class="start-button" (click)="onStart()">
+      <span>Get Started</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>

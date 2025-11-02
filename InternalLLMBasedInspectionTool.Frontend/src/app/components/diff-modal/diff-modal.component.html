@@ -1,0 +1,23 @@
+@if (isOpen()) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Code Diff</h2>
+        <button class="close-button" (click)="closeModal()" aria-label="Close">
+          <div [innerHTML]="closeIcon"></div>
+        </button>
+      </div>
+      <div class="diff-editor-container">
+        <div class="diff-header">
+          <div class="diff-header-left">
+            <span class="diff-title">Before</span>
+          </div>
+          <div class="diff-header-right">
+            <span class="diff-title">After</span>
+          </div>
+        </div>
+        <div #diffContainer class="diff-container"></div>
+      </div>
+    </div>
+  </div>
+}

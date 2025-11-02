@@ -1,0 +1,233 @@
+@use '../../../styles/variables' as *;
+
+.editor-page {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: $bg-dark;
+  overflow: hidden;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.editor-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.editor-footer {
+  width: 100%;
+  min-height: 64px;
+  background: $bg-secondary;
+  border-top: 1px solid $border-color;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .footer-tab {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background: $primary-10;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    color: $white-90;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $primary-15;
+      border-color: $primary-40;
+      color: $white;
+    }
+
+    &:active {
+      background: $primary-20;
+    }
+
+    .tab-label {
+      margin: 0;
+    }
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: $overlay-dark;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal-content {
+  background: $bg-dark;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px $shadow-dark;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $white-90;
+    margin: 0;
+  }
+
+  .close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    color: $white-80;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $primary-10;
+      border-color: $primary-40;
+      color: $white;
+    }
+
+    &:active {
+      background: $primary-20;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.modal-body {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 0;
+
+  .empty-state-icon {
+    margin-bottom: 1.5rem;
+    color: $primary;
+    opacity: 0.7;
+
+    svg {
+      width: 64px;
+      height: 64px;
+      filter: drop-shadow(0 0 10px $primary-30);
+    }
+  }
+
+  .empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $white-90;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .empty-state-description {
+    font-size: 1rem;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin: 0 0 2rem 0;
+  }
+
+  .empty-state-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+
+    .step-item {
+      display: flex;
+      gap: 1rem;
+      text-align: left;
+      padding: 1rem;
+      background: $bg-secondary;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba($bg-secondary-color, 0.8);
+        border-color: $primary-30;
+      }
+
+      .step-number {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: $primary-10;
+        border: 2px solid $primary;
+        border-radius: 50%;
+        color: $primary;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+
+      .step-content {
+        flex: 1;
+
+        .step-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: $white-90;
+          margin: 0 0 0.25rem 0;
+        }
+
+        .step-text {
+          font-size: 0.875rem;
+          color: $text-secondary;
+          line-height: 1.5;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+

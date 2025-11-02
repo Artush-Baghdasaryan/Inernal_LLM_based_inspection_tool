@@ -1,0 +1,129 @@
+@use './styles/variables' as *;
+
+/* Global Styles - Dark Theme */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: #{$bg-dark-color};
+  --bg-secondary: #{$bg-secondary-color};
+  --bg-tertiary: #{$input-bg};
+  --text-primary: #{$text-primary};
+  --text-secondary: #{$text-secondary};
+  --text-muted: #{$text-muted};
+  --border-color: #{$scrollbar-thumb};
+  --accent-primary: #{$primary};
+  --accent-secondary: #{$secondary};
+  --accent-gradient: linear-gradient(135deg, #{$primary}, #{$secondary});
+  --error-color: #{$accent};
+  --success-color: #{$accent};
+  --warning-color: #{$accent};
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#root, app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// Scrollbar styles
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: $scrollbar-thumb;
+  border-radius: 5px;
+  
+  &:hover {
+    background: $scrollbar-thumb-hover;
+  }
+}
+
+// Selection styles
+::selection {
+  background: $primary-30;
+  color: var(--text-primary);
+}
+
+// Focus styles
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+p {
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+// Links
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--accent-secondary);
+  }
+}
+
+// Buttons base styles
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+// Inputs
+input, textarea, select {
+  font-family: inherit;
+  color: var(--text-primary);
+  background: $input-bg;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px $primary-10;
+  }
+}

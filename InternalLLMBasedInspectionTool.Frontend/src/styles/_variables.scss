@@ -1,0 +1,63 @@
+// Color Variables
+$primary: #6366f1;
+$secondary: #8b5cf6;
+$accent: #ec4899;
+$white: #fff;
+$black: #000000;
+$text-primary: #e5e7eb;
+
+// Background Color Values
+$bg-dark-color: #0a0e27;
+$bg-secondary-color: #1a1f3a;
+$bg-tertiary-color: #0f1422;
+
+// Background Variables
+$bg-dark: $bg-dark-color;
+$bg-secondary: rgba($bg-secondary-color, 0.6);
+$bg-header: rgba($bg-secondary-color, 0.8);
+$bg-dark-gradient: linear-gradient(135deg, $bg-dark-color 0%, $bg-secondary-color 50%, $bg-tertiary-color 100%);
+
+// Border Variables
+$border-color: rgba($primary, 0.2);
+
+// Overlay and Shadow Colors
+$overlay-dark: rgba($black, 0.75);
+$shadow-dark: rgba($black, 0.5);
+$shadow-primary: rgba($primary, 0.4);
+
+// Primary Color with Opacity
+$primary-10: rgba($primary, 0.1);
+$primary-15: rgba($primary, 0.15);
+$primary-20: rgba($primary, 0.2);
+$primary-30: rgba($primary, 0.3);
+$primary-40: rgba($primary, 0.4);
+$primary-50: rgba($primary, 0.5);
+$primary-60: rgba($primary, 0.6);
+
+// White Color with Opacity
+$white-80: rgba($white, 0.8);
+$white-90: rgba($white, 0.9);
+
+// Text Colors with Opacity
+$text-secondary: rgba($white, 0.7);
+$text-muted: rgba($white, 0.5);
+
+// Input Background
+$input-bg: rgba($white, 0.05);
+$input-bg-hover: rgba($white, 0.2);
+$input-bg-active: rgba($white, 0.3);
+
+// Scrollbar Colors
+$scrollbar-thumb: rgba($white, 0.2);
+$scrollbar-thumb-hover: rgba($white, 0.3);
+
+// Secondary Color with Opacity
+$secondary-15: rgba($secondary, 0.15);
+$secondary-30: rgba($secondary, 0.3);
+
+// Accent Color with Opacity
+$accent-15: rgba($accent, 0.15);
+
+// White Color with Opacity (additional)
+$white-30: rgba($white, 0.3);
+

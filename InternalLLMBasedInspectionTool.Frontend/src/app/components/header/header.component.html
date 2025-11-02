@@ -1,0 +1,14 @@
+<header class="header">
+  <div class="header-content">
+    <div class="logo-section">
+      <div class="logo">
+        <div [innerHTML]="logoIcon"></div>
+      </div>
+      <span class="app-name">Internal LLM-based Inspection Tool</span>
+    </div>
+    <button class="settings-button" (click)="onSettingsClick()" aria-label="Settings">
+      <div [innerHTML]="settingsIcon"></div>
+    </button>
+  </div>
+</header>
+

@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: $overlay-dark;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal-content {
+  background: $bg-dark;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 95vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px $shadow-dark;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $white-90;
+    margin: 0;
+  }
+
+  .close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    color: $white-80;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $primary-10;
+      border-color: $primary-40;
+      color: $white;
+    }
+
+    &:active {
+      background: $primary-20;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.diff-editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+
+  .diff-header {
+    display: flex;
+    height: 40px;
+    background: $bg-secondary;
+    border-bottom: 1px solid $border-color;
+    z-index: 1;
+
+    .diff-header-left,
+    .diff-header-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-right: 1px solid $border-color;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      .diff-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: $white-90;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    }
+
+    .diff-header-left {
+      .diff-title {
+        color: $text-secondary;
+      }
+    }
+
+    .diff-header-right {
+      .diff-title {
+        color: $text-secondary;
+      }
+    }
+  }
+
+  .diff-container {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
