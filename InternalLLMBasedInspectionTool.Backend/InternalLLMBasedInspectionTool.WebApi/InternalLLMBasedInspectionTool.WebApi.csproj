@@ -10,4 +10,13 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\InternalLLMBasedInspectionTool.Application\InternalLLMBasedInspectionTool.Application.csproj" />
+        <ProjectReference Include="..\InternalLLMBasedInspectionTool.Infrastructure\InternalLLMBasedInspectionTool.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\Users\" />
+    </ItemGroup>
+
 </Project>

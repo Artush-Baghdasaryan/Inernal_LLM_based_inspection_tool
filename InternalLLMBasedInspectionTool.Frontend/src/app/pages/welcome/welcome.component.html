@@ -2,7 +2,11 @@
   <div class="animated-background">
     <div class="floating-shapes">
       @for (i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]; track i) {
-        <div class="shape" [class]="'shape-' + i" [style.animation-delay]="(i * 0.3) + 's'"></div>
+        <div 
+          class="shape"
+          [class]="'shape-' + i"
+          [style.animation-delay]="(i * 0.3) + 's'"
+        ></div>
       }
     </div>
     <div class="gradient-orb orb-1"></div>
@@ -40,11 +44,33 @@
       Upload your code or write from scratch, get detailed feedback and recommendations.
     </p>
     
-    <button class="start-button" (click)="onStart()">
-      <span>Get Started</span>
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <div class="input-container">
+      <input 
+        type="text"
+        placeholder="Enter your nickname"
+        class="nickname-input"
+        [disabled]="isLoading"
+        [(ngModel)]="nickname"
+        (keyup.enter)="onStart()"
+      />
+      @if (error) {
+        <div class="error-message">{{ error }}</div>
+      }
+    </div>
+    
+    <button 
+      class="start-button"
+      [disabled]="isLoading || !nickname.trim()"
+      (click)="onStart()"
+    >
+      @if (!isLoading) {
+        <span>Get Started</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      } @else {
+        <span>Loading...</span>
+      }
     </button>
   </div>
 </div>

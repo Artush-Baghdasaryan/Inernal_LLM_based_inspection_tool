@@ -1,65 +1,257 @@
 <div class="editor-page">
-  <app-header></app-header>
-  <div class="editor-main">
-    <app-code-editor></app-code-editor>
-    <div class="editor-content">
-      <!-- Additional content will be added here -->
+    <app-header></app-header>
+    <div class="editor-main">
+        <div class="editor-layout">
+            <app-attachments-panel
+                [attachments]="attachments()"
+                [currentAttachmentId]="currentAttachmentId()"
+                (onAttachmentSelected)="onAttachmentSelected($event)"
+                (onAttachmentsChanged)="onAttachmentsChanged()"
+            ></app-attachments-panel>
+            <div class="editor-content-wrapper">
+                <app-code-editor 
+                    (attachmentCreated)="onAttachmentCreated()"
+                ></app-code-editor>
+                <div class="editor-content">
+                    <!-- Additional content will be added here -->
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <footer class="editor-footer">
-    <button class="footer-tab" (click)="onIssuesClick()">
-      <span class="tab-label">Issues</span>
-    </button>
-  </footer>
+    <footer class="editor-footer">
+        <button 
+            class="footer-tab"
+            (click)="onIssuesClick()"
+        >
+            <span class="tab-label">Issues</span>
+        </button>
+        <button 
+            class="footer-tab"
+            (click)="onPromptSettingsClick()"
+        >
+            <span class="tab-label">Prompt Settings</span>
+        </button>
+    </footer>
 
-  @if (showIssuesModal()) {
-    <div class="modal-backdrop" (click)="closeIssuesModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2 class="modal-title">Issues</h2>
-          <button class="close-button" (click)="closeIssuesModal()" aria-label="Close">
-            <div [innerHTML]="closeIcon"></div>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="empty-state">
-            <div class="empty-state-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
-              </svg>
+    <app-toast></app-toast>
+
+      @if (showIssuesModal()) {
+        <div 
+            class="modal-backdrop"
+            (click)="closeIssuesModal()"
+        >
+            <div 
+                class="modal-content"
+                (click)="$event.stopPropagation()"
+            >
+                <div class="modal-header">
+                    <h2 class="modal-title">Issues</h2>
+                    <button 
+                        aria-label="Close"
+                        class="close-button"
+                        [innerHTML]="closeIcon"
+                        (click)="closeIssuesModal()"
+                    ></button>
+                </div>
+                <div class="modal-body">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4M12 8h.01"/>
+                            </svg>
+                        </div>
+                        <h3 class="empty-state-title">No Issues Found</h3>
+                        <p class="empty-state-description">
+                            To analyze your code for issues, warnings, and errors, follow these steps:
+                        </p>
+                        <div class="empty-state-steps">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Upload Code</div>
+                                    <div class="step-text">Upload your code file using the "Upload Code" button in the editor header.</div>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Edit It</div>
+                                    <div class="step-text">Edit the code directly in the Monaco Editor. Make changes to see the differences.</div>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Build Prompt and Analyze Changes</div>
+                                    <div class="step-text">Click the "Form a prompt" button in the editor header to create an analysis prompt and start the code analysis. The system will scan your code and identify any issues, warnings, and errors.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h3 class="empty-state-title">No Issues Found</h3>
-            <p class="empty-state-description">
-              To analyze your code for issues, warnings, and errors, follow these steps:
-            </p>
-            <div class="empty-state-steps">
-              <div class="step-item">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                  <div class="step-title">Upload Code</div>
-                  <div class="step-text">Upload your code file using the "Upload Code" button in the editor header.</div>
-                </div>
-              </div>
-              <div class="step-item">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                  <div class="step-title">Edit It</div>
-                  <div class="step-text">Edit the code directly in the Monaco Editor. Make changes to see the differences.</div>
-                </div>
-              </div>
-              <div class="step-item">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                  <div class="step-title">Build Prompt and Analyze Changes</div>
-                  <div class="step-text">Click the "Form a prompt" button in the editor header to create an analysis prompt and start the code analysis. The system will scan your code and identify any issues, warnings, and errors.</div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  }
+    }
+
+    @if (showPromptSettingsModal()) {
+        <div 
+            class="modal-backdrop"
+            (click)="closePromptSettingsModal()"
+        >
+            <div 
+                class="modal-content prompt-settings-modal"
+                (click)="$event.stopPropagation()"
+            >
+                <div class="modal-header">
+                    <h2 class="modal-title">Prompt Settings</h2>
+                    <button 
+                        aria-label="Close"
+                        class="close-button"
+                        [innerHTML]="closeIcon"
+                        (click)="closePromptSettingsModal()"
+                    ></button>
+                </div>
+                <div class="modal-body">
+                    @if (promptSettings()) {
+                        <div class="prompt-settings-form">
+                            <div class="settings-grid">
+                                <div class="settings-group">
+                                    <h3 class="settings-group-title">Code Quality Checks</h3>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.checkReadability"
+                                            />
+                                            <span>Check Readability</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.checkPerformance"
+                                            />
+                                            <span>Check Performance</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.checkCorrectness"
+                                            />
+                                            <span>Check Correctness</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.checkStyle"
+                                            />
+                                            <span>Check Style</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.checkMaintainability"
+                                            />
+                                            <span>Check Maintainability</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.checkSecurity"
+                                            />
+                                            <span>Check Security</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h3 class="settings-group-title">Detection Options</h3>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.detectLargeExpressions"
+                                            />
+                                            <span>Detect Large Expressions</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.detectNestedConditions"
+                                            />
+                                            <span>Detect Nested Conditions</span>
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                [(ngModel)]="promptSettings()!.evaluateMemoryAllocations"
+                                            />
+                                            <span>Evaluate Memory Allocations</span>
+                                        </label>
+                                    </div>
+                                    <h3 class="settings-group-title">Thresholds</h3>
+                                    <div class="settings-row">
+                                        <label class="slider-label">
+                                            <span>Min Confidence Threshold: {{ promptSettings()!.minConfidenceThreshold.toFixed(2) }}</span>
+                                            <input 
+                                                type="range"
+                                                min="0"
+                                                max="1"
+                                                step="0.01"
+                                                [(ngModel)]="promptSettings()!.minConfidenceThreshold"
+                                                class="slider-input"
+                                            />
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label class="slider-label">
+                                            <span>Determinism Level: {{ promptSettings()!.determinismLevel.toFixed(2) }}</span>
+                                            <input 
+                                                type="range"
+                                                min="0"
+                                                max="1"
+                                                step="0.01"
+                                                [(ngModel)]="promptSettings()!.determinismLevel"
+                                                class="slider-input"
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button 
+                        class="close-button-footer"
+                        (click)="closePromptSettingsModal()"
+                    >
+                        Close
+                    </button>
+                    <button 
+                        class="save-button"
+                        [disabled]="!hasPromptSettingsChanges()"
+                        (click)="savePromptSettings()"
+                    >
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 

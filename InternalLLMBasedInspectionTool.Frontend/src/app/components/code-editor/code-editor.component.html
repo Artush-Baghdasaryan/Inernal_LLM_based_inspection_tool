@@ -3,37 +3,39 @@
     <div class="editor-header-left">
       <label class="upload-button">
         <input 
-          type="file" 
-          class="file-input" 
+          type="file"
           accept=".ts,.js,.py,.java,.cpp,.cs,.go,.rs,.html,.css,.json,.yaml,.yml,.txt"
-          (change)="onFileSelected($event)" />
+          class="file-input"
+          (change)="onFileSelected($event)"
+        />
         Upload Code
       </label>
-      <select 
-        class="language-select" 
-        [ngModel]="selectedLanguage()" 
-        (ngModelChange)="selectedLanguage.set($event); onLanguageChange()">
-        @for (lang of languages; track lang.value) {
-          <option [value]="lang.value">{{ lang.label }}</option>
-        }
-      </select>
-      <button class="see-diff-button" (click)="onSeeDiff()">
+      <button 
+        class="load-sample-button"
+        (click)="onLoadSampleClick()"
+      >
+        Load Sample Code
+      </button>
+      <button 
+        class="see-diff-button"
+        (click)="onSeeDiff()"
+      >
         See Diff
       </button>
     </div>
     <div class="editor-header-right">
       <button 
-        class="prompt-settings-button" 
         aria-label="Prompt settings"
         title="Prompt settings"
+        class="prompt-settings-button"
+        [innerHTML]="promptSettingsIcon"
         (click)="onPromptSettingsClick()"
-      >
-        <div [innerHTML]="promptSettingsIcon"></div>
-      </button>
+      ></button>
       <button 
-        class="form-prompt-button" 
+        class="form-prompt-button"
         [disabled]="!hasDiff()"
-        (click)="onFormPrompt()">
+        (click)="onFormPrompt()"
+      >
         Form a prompt
       </button>
     </div>
@@ -64,20 +66,28 @@
             <div class="empty-state-actions">
               <label class="upload-code-button">
                 <input 
-                  type="file" 
-                  class="file-input" 
+                  type="file"
                   accept=".ts,.js,.py,.java,.cpp,.cs,.go,.rs,.html,.css,.json,.yaml,.yml,.txt"
-                  (change)="onFileSelected($event)" />
+                  class="file-input"
+                  (change)="onFileSelected($event)"
+                />
                 Upload Code File
               </label>
-              <button class="load-sample-button" (click)="onLoadSampleCode()">
+              <button 
+                class="load-sample-button"
+                (click)="onLoadSampleClick()"
+              >
                 Load Sample Code
               </button>
             </div>
           </div>
         </div>
       }
-      <div #editorContainer class="monaco-container" [class.hidden]="isMonacoLoading() || !hasCodeUploaded()"></div>
+      <div 
+        #editorContainer
+        class="monaco-container"
+        [class.hidden]="isMonacoLoading() || !hasCodeUploaded()"
+      ></div>
     </div>
   
   @if (showDiffModal()) {
@@ -91,16 +101,62 @@
   }
 
   @if (showPromptSettingsModal()) {
-    <div class="modal-backdrop" (click)="closePromptSettingsModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div 
+      class="modal-backdrop"
+      (click)="closePromptSettingsModal()"
+    >
+      <div 
+        class="modal-content"
+        (click)="$event.stopPropagation()"
+      >
         <div class="modal-header">
           <h2 class="modal-title">Prompt settings</h2>
-          <button class="close-button" (click)="closePromptSettingsModal()" aria-label="Close">
-            <div [innerHTML]="closeIcon"></div>
-          </button>
+          <button 
+            aria-label="Close"
+            class="close-button"
+            [innerHTML]="closeIcon"
+            (click)="closePromptSettingsModal()"
+          ></button>
         </div>
         <div class="modal-body">
           <!-- Content will be added here -->
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showLoadSampleModal()) {
+    <div 
+      class="modal-backdrop"
+      (click)="closeLoadSampleModal()"
+    >
+      <div 
+        class="modal-content"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <h2 class="modal-title">Load Sample Code</h2>
+          <button 
+            aria-label="Close"
+            class="close-button"
+            [innerHTML]="closeIcon"
+            (click)="closeLoadSampleModal()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="language-selection">
+            <p class="language-selection-title">Select a language:</p>
+            <div class="language-grid">
+              @for (lang of languages; track lang.value) {
+                <button 
+                  class="language-option"
+                  (click)="onLoadSampleCode(lang.value)"
+                >
+                  {{ lang.label }}
+                </button>
+              }
+            </div>
+          </div>
         </div>
       </div>
     </div>

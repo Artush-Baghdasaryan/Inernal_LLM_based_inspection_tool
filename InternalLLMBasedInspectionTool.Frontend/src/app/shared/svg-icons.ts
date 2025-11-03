@@ -42,5 +42,26 @@ export const SvgIcons = {
     return `<svg width="${width}" height="${height}" viewBox="0 0 20 20" fill="none">
       <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`;
+  },
+
+  // Remove/Delete icon
+  remove: (width: string | number = 16, height: string | number = 16): string => {
+    return `<svg width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+    </svg>`;
+  },
+
+  // Chevron down icon
+  chevronDown: (width: string | number = 16, height: string | number = 16): string => {
+    return `<svg width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>`;
+  },
+
+  // Chevron right icon
+  chevronRight: (width: string | number = 16, height: string | number = 16): string => {
+    return `<svg width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>`;
   }
 } as const;

@@ -28,8 +28,8 @@
     gap: 0.75rem;
   }
 
-  .language-select {
-    padding: 0.5rem 1rem;
+  .load-sample-button {
+    padding: 0.5rem 1.25rem;
     background: $primary-10;
     border: 1px solid $border-color;
     border-radius: 6px;
@@ -42,17 +42,11 @@
     &:hover {
       background: $primary-15;
       border-color: $primary-40;
-    }
-
-    &:focus {
-      outline: none;
-      border-color: $primary-50;
-      background: $primary-20;
-    }
-
-    option {
-      background: $bg-dark;
       color: $white;
+    }
+
+    &:active {
+      background: $primary-20;
     }
   }
 
@@ -421,5 +415,50 @@
   flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
+}
+
+.language-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .language-selection-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $white-90;
+    margin: 0;
+  }
+
+  .language-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+
+    .language-option {
+      padding: 0.75rem 1rem;
+      background: $primary-10;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      color: $white-90;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+
+      &:hover {
+        background: $primary-15;
+        border-color: $primary-40;
+        color: $white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px $shadow-primary;
+      }
+
+      &:active {
+        transform: translateY(0);
+        background: $primary-20;
+      }
+    }
+  }
 }
 

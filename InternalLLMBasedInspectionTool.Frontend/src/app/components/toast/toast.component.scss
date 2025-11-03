@@ -1,0 +1,94 @@
+@use '../../../styles/variables' as *;
+
+.toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: 8px;
+    background: $bg-dark;
+    border: 1px solid $border-color;
+    box-shadow: 0 4px 12px rgba($black, 0.3);
+    min-width: 280px;
+    max-width: 400px;
+    pointer-events: auto;
+    animation: slideIn 0.3s ease-out;
+
+    &.success {
+        border-color: rgba($accent, 0.4);
+        background: rgba($bg-dark-color, 0.95);
+
+        .toast-message {
+            color: $white-90;
+        }
+    }
+
+    &.error {
+        border-color: rgba($accent, 0.4);
+        background: rgba($bg-dark-color, 0.95);
+
+        .toast-message {
+            color: $white-90;
+        }
+    }
+
+    &.info {
+        border-color: rgba($primary, 0.4);
+        background: rgba($bg-dark-color, 0.95);
+
+        .toast-message {
+            color: $white-90;
+        }
+    }
+
+    .toast-message {
+        flex: 1;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        color: $white-80;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+            color: $white;
+        }
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+

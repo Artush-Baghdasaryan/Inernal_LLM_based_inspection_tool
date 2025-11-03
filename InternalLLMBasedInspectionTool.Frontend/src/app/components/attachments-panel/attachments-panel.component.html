@@ -1,0 +1,50 @@
+<div 
+    class="attachments-panel"
+    [class.collapsed]="isCollapsed"
+>
+    <button 
+        class="panel-header"
+        (click)="toggleCollapse()"
+    >
+        <span class="panel-title">Files</span>
+        <div 
+            class="chevron-icon"
+            [innerHTML]="chevronIcon"
+        ></div>
+    </button>
+
+    @if (!isCollapsed) {
+        <div class="panel-content">
+            @if (attachments().length === 0) {
+                <div class="empty-state">
+                    <p class="empty-text">No files uploaded</p>
+                </div>
+            } @else {
+                <div class="attachments-list">
+                    @for (attachment of attachments(); track attachment.id) {
+                        <div 
+                            class="attachment-item"
+                            [class.hovered]="hoveredAttachmentId === attachment.id"
+                            [class.active]="currentAttachmentId() === attachment.id"
+                            (click)="onAttachmentClick(attachment)"
+                            (mouseenter)="onItemMouseEnter(attachment.id)"
+                            (mouseleave)="onItemMouseLeave()"
+                        >
+                            <span class="attachment-name">{{ attachment.name }}</span>
+                            @if (hoveredAttachmentId === attachment.id) {
+                                <button 
+                                    class="remove-button"
+                                    aria-label="Remove"
+                                    (click)="onRemoveClick($event, attachment)"
+                                >
+                                    <div [innerHTML]="removeIcon"></div>
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
