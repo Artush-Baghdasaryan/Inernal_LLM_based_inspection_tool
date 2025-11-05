@@ -275,15 +275,9 @@ export class EditorComponent implements OnInit {
     }
 
     public onIssuesFixed(issueIndices: number[]): void {
-        // Store indices for marking as fixed after accepting changes
         this.lastFixedIssueIndices.set(issueIndices);
     }
 
-    /**
-     * Merges AI-fixed code with current user-edited data
-     * Case 2: User edited data (left) -> AI fixed data (right)
-     * Result: editedData becomes fixedCode, originalData stays the same
-     */
     public onAcceptFixedChanges(fixedCode: string): void {
         const editor = this.codeEditor();
         const attachmentId = this.currentAttachmentId();
@@ -309,7 +303,6 @@ export class EditorComponent implements OnInit {
                     return;
                 }
 
-                // Merge AI-fixed code: editedData becomes fixedCode, originalData remains unchanged
                 this.saveMergedCode(attachmentId, user.id, attachment, originalData, fixedCode, codeLanguage, editor);
             },
             error: (error) => {
@@ -319,9 +312,6 @@ export class EditorComponent implements OnInit {
         });
     }
 
-    /**
-     * Saves merged code and updates UI
-     */
     private saveMergedCode(
         attachmentId: string,
         userId: string,
@@ -361,9 +351,6 @@ export class EditorComponent implements OnInit {
         });
     }
 
-    /**
-     * Marks selected issues as fixed
-     */
     private markIssuesAsFixed(attachmentId: string): void {
         const fixedIndices = this.lastFixedIssueIndices();
         if (fixedIndices.length === 0) {
@@ -372,7 +359,6 @@ export class EditorComponent implements OnInit {
 
         this.codeAttachmentsService.markIssuesAsFixed(attachmentId, fixedIndices).subscribe({
             next: () => {
-                // Reload analysis to reflect fixed issues
                 setTimeout(() => {
                     this.codeAttachmentsService.getAnalysisByAttachmentId(attachmentId).subscribe({
                         next: (analysis) => {
@@ -392,9 +378,6 @@ export class EditorComponent implements OnInit {
         });
     }
 
-    /**
-     * Reloads attachment and updates editor with new data
-     */
     private reloadAttachmentAndUpdateEditor(
         attachmentId: string,
         editor: CodeEditorComponent,

@@ -57,7 +57,6 @@ export class DiffModalComponent implements OnInit, OnDestroy {
                 if (!this.diffEditor) {
                     this.initDiffEditor();
                 } else {
-                    // Update models when content changes and editor already exists
                     this.updateDiffModels();
                 }
             }
@@ -144,7 +143,6 @@ export class DiffModalComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Dispose old models
         if (this.originalModel) {
             this.originalModel.dispose();
         }
@@ -152,7 +150,6 @@ export class DiffModalComponent implements OnInit, OnDestroy {
             this.modifiedModel.dispose();
         }
 
-        // Create new models with updated content
         this.originalModel = monacoInstance.editor.createModel(
             this.originalContent() || '',
             this.language(),
@@ -163,13 +160,11 @@ export class DiffModalComponent implements OnInit, OnDestroy {
             this.language(),
         );
 
-        // Update diff editor with new models
         this.diffEditor.setModel({
             original: this.originalModel,
             modified: this.modifiedModel,
         });
 
-        // Update layout after model change
         setTimeout(() => {
             if (this.diffEditor) {
                 this.diffEditor.layout();
@@ -193,7 +188,6 @@ export class DiffModalComponent implements OnInit, OnDestroy {
     }
 
     public acceptChanges(): void {
-        // Get the modified content (right side) from the diff editor
         const modifiedContent = this.modifiedModel?.getValue() || this.editedContent();
         this.onAcceptChanges.emit(modifiedContent);
     }

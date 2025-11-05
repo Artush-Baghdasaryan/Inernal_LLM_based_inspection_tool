@@ -236,26 +236,17 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         this.showDiffModal.set(false);
     }
 
-    /**
-     * Merges edited data with original data
-     * Case 1: Original data (left) -> Edited data (right)
-     * Result: originalData becomes editedContent, editedData becomes editedContent (both same)
-     */
     public async onMergeToOriginal(editedContent: string): Promise<void> {
-        // Use edited content from parameter (from diff modal) or current editor content
         const mergedContent = editedContent || this.editorContent();
         
-        // Update local state
         this.originalContent.set(mergedContent);
         this.loadedEditedContent.set(mergedContent);
         this.editorContent.set(mergedContent);
 
-        // Update editor
         if (this.editorInstance) {
             this.editorInstance.setValue(mergedContent);
         }
 
-        // Save to backend if attachment exists
         if (this._currentAttachmentId()) {
             await this.updateAttachmentWithMergedContent(mergedContent);
         }
@@ -414,16 +405,13 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
 
         if (!attachmentId || !user?.id) {
             this.toastService.show(
-                'Необходимо выбрать файл для анализа',
+                'Please select a file for analysis',
                 'error',
             );
             return;
         }
 
-        // Close prompt modal first
         this.showPromptModal.set(false);
-        
-        // Start loading
         this.isAnalyzing.set(true);
 
         const request: AnalyseCodeRequest = {
@@ -434,22 +422,19 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
             .analyse(attachmentId, user.id, request)
             .subscribe({
                 next: (analysis) => {
-                    // Wait a bit for progress to complete, then close modal
                     setTimeout(() => {
                         this.isAnalyzing.set(false);
-                        // Emit to parent component instead of showing modal here
                         this.analysisCompleted.emit(analysis);
-                        this.toastService.show('Анализ завершен успешно', 'success');
+                        this.toastService.show('Analysis completed successfully', 'success');
                     }, 500);
                 },
                 error: (error) => {
-                    console.error('Ошибка при анализе кода:', error);
+                    console.error('Error analyzing code:', error);
                     this.isAnalyzing.set(false);
-                    this.toastService.show('Ошибка при анализе кода', 'error');
+                    this.toastService.show('Failed to analyze code', 'error');
                 },
             });
     }
-
 
     public async onFileSelected(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
