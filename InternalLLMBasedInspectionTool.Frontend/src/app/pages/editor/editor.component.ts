@@ -279,92 +279,135 @@ export class EditorComponent implements OnInit {
         this.lastFixedIssueIndices.set(issueIndices);
     }
 
+    /**
+     * Merges AI-fixed code with current user-edited data
+     * Case 2: User edited data (left) -> AI fixed data (right)
+     * Result: editedData becomes fixedCode, originalData stays the same
+     */
     public onAcceptFixedChanges(fixedCode: string): void {
         const editor = this.codeEditor();
         const attachmentId = this.currentAttachmentId();
         const user = this.userStateService.user();
 
         if (!editor || !attachmentId || !user) {
-            console.error('Missing required data for accepting changes');
             this.toastService.show('Failed to accept changes', 'error');
             return;
         }
 
-        // Update editor content
-        editor.updateEditedData(fixedCode);
-
-        // Get attachment data
         this.codeAttachmentsService.getById(attachmentId).subscribe({
             next: (attachment) => {
                 if (!attachment.originalData || !attachment.editedData) {
-                    console.error('Attachment data is incomplete');
                     this.toastService.show('Failed to accept changes', 'error');
                     return;
                 }
 
-                // Calculate diff hunks
                 const originalData = attachment.originalData;
                 const codeLanguage = attachment.codeLanguage;
                 
                 if (!originalData || !codeLanguage) {
-                    console.error('Attachment data is incomplete');
                     this.toastService.show('Failed to accept changes', 'error');
                     return;
                 }
 
-                calculateUnifiedDiff(originalData, fixedCode).then((diffHunks) => {
-                    const updateRequest: SaveCodeAttachmentRequest = {
-                        userId: user.id,
-                        name: attachment.name,
-                        mimeType: attachment.mimeType,
-                        codeLanguage: codeLanguage,
-                        originalData: originalData,
-                        editedData: fixedCode,
-                        diffHunks: diffHunks,
-                    };
-
-                    this.codeAttachmentsService.update(attachmentId, updateRequest).subscribe({
-                        next: () => {
-                            // Mark issues as fixed after saving changes
-                            const fixedIndices = this.lastFixedIssueIndices();
-                            if (fixedIndices.length > 0) {
-                                this.codeAttachmentsService.markIssuesAsFixed(attachmentId, fixedIndices).subscribe({
-                                    next: () => {
-                                        // Reload analysis to reflect fixed issues
-                                        setTimeout(() => {
-                                            this.codeAttachmentsService.getAnalysisByAttachmentId(attachmentId).subscribe({
-                                                next: (analysis) => {
-                                                    if (analysis) {
-                                                        this.analysisResult.set(analysis);
-                                                    }
-                                                },
-                                                error: (error) => {
-                                                    console.error('Failed to reload analysis:', error);
-                                                }
-                                            });
-                                        }, 500);
-                                    },
-                                    error: (error) => {
-                                        console.error('Failed to mark issues as fixed:', error);
-                                    }
-                                });
-                            }
-
-                            this.toastService.show('Changes accepted and saved', 'success');
-                            this.showFixDiffModal.set(false);
-                            this.currentEditedData.set(fixedCode);
-                            this.lastFixedIssueIndices.set([]);
-                        },
-                        error: (error) => {
-                            console.error('Failed to save changes:', error);
-                            this.toastService.show('Failed to save changes', 'error');
-                        },
-                    });
-                });
+                // Merge AI-fixed code: editedData becomes fixedCode, originalData remains unchanged
+                this.saveMergedCode(attachmentId, user.id, attachment, originalData, fixedCode, codeLanguage, editor);
             },
             error: (error) => {
                 console.error('Failed to load attachment:', error);
                 this.toastService.show('Failed to accept changes', 'error');
+            },
+        });
+    }
+
+    /**
+     * Saves merged code and updates UI
+     */
+    private saveMergedCode(
+        attachmentId: string,
+        userId: string,
+        attachment: any,
+        originalData: string,
+        mergedEditedData: string,
+        codeLanguage: any,
+        editor: CodeEditorComponent,
+    ): void {
+        calculateUnifiedDiff(originalData, mergedEditedData).then((diffHunks) => {
+            const updateRequest: SaveCodeAttachmentRequest = {
+                userId: userId,
+                name: attachment.name,
+                mimeType: attachment.mimeType,
+                codeLanguage: codeLanguage,
+                originalData: originalData,
+                editedData: mergedEditedData,
+                diffHunks: diffHunks,
+            };
+
+            this.codeAttachmentsService.update(attachmentId, updateRequest).subscribe({
+                next: () => {
+                    this.markIssuesAsFixed(attachmentId);
+                    this.reloadAttachmentAndUpdateEditor(attachmentId, editor);
+                    this.toastService.show('Changes accepted and saved', 'success');
+                    this.showFixDiffModal.set(false);
+                    this.lastFixedIssueIndices.set([]);
+                },
+                error: (error) => {
+                    console.error('Failed to save changes:', error);
+                    this.toastService.show('Failed to save changes', 'error');
+                },
+            });
+        }).catch((error) => {
+            console.error('Failed to calculate diff:', error);
+            this.toastService.show('Failed to save changes', 'error');
+        });
+    }
+
+    /**
+     * Marks selected issues as fixed
+     */
+    private markIssuesAsFixed(attachmentId: string): void {
+        const fixedIndices = this.lastFixedIssueIndices();
+        if (fixedIndices.length === 0) {
+            return;
+        }
+
+        this.codeAttachmentsService.markIssuesAsFixed(attachmentId, fixedIndices).subscribe({
+            next: () => {
+                // Reload analysis to reflect fixed issues
+                setTimeout(() => {
+                    this.codeAttachmentsService.getAnalysisByAttachmentId(attachmentId).subscribe({
+                        next: (analysis) => {
+                            if (analysis) {
+                                this.analysisResult.set(analysis);
+                            }
+                        },
+                        error: (error) => {
+                            console.error('Failed to reload analysis:', error);
+                        },
+                    });
+                }, 500);
+            },
+            error: (error) => {
+                console.error('Failed to mark issues as fixed:', error);
+            },
+        });
+    }
+
+    /**
+     * Reloads attachment and updates editor with new data
+     */
+    private reloadAttachmentAndUpdateEditor(
+        attachmentId: string,
+        editor: CodeEditorComponent,
+    ): void {
+        this.codeAttachmentsService.getById(attachmentId).subscribe({
+            next: (updatedAttachment) => {
+                if (updatedAttachment.originalData && updatedAttachment.editedData) {
+                    editor.loadAttachment(updatedAttachment);
+                    this.currentEditedData.set(updatedAttachment.editedData);
+                }
+            },
+            error: (error) => {
+                console.error('Failed to reload attachment:', error);
             },
         });
     }

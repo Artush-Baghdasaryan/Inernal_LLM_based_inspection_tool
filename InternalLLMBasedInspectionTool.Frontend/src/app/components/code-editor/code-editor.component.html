@@ -103,7 +103,7 @@
             [language]="selectedLanguage()"
             [isOpen]="showDiffModal()"
             [onClose]="closeDiffModal.bind(this)"
-            (onMerge)="onMergeToOriginal()"
+            (onAcceptChanges)="onMergeToOriginal($event)"
         ></app-diff-modal>
     }
 
