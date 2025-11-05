@@ -10,5 +10,4 @@ public record CodeAttachmentModel {
     public required CodeLanguage CodeLanguage { get; init; }
     public required string OriginalData { get; init; }
     public required string EditedData { get; init; }
-    public required string DiffData { get; init; }
 }

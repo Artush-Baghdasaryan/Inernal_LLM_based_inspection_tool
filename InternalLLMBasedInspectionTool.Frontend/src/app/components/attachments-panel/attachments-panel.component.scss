@@ -1,4 +1,4 @@
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .attachments-panel {
     width: 280px;
@@ -8,7 +8,9 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    transition: width 0.2s ease, min-width 0.2s ease;
+    transition:
+        width 0.2s ease,
+        min-width 0.2s ease;
 
     &.collapsed {
         width: 60px;
@@ -122,6 +124,14 @@
                     cursor: pointer;
                     transition: all 0.2s ease;
                     margin-left: 0.5rem;
+                    opacity: 0;
+                    pointer-events: none;
+                    flex-shrink: 0;
+
+                    &.visible {
+                        opacity: 1;
+                        pointer-events: auto;
+                    }
 
                     &:hover {
                         background: rgba($accent, 0.2);
@@ -141,4 +151,3 @@
         }
     }
 }
-

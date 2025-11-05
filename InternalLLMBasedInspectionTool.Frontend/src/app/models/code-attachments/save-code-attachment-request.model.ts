@@ -7,6 +7,5 @@ export interface SaveCodeAttachmentRequest {
     codeLanguage: CodeLanguage;
     originalData: string;
     editedData: string;
-    diffData: string;
+    diffHunks: string[];
 }
-

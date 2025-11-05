@@ -1,4 +1,3 @@
 export interface CreateUserRequest {
-  nickname: string;
+    nickname: string;
 }
-

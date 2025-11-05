@@ -4,11 +4,11 @@ import { User } from '../models/users/user.model';
 const USER_STORAGE_KEY = 'app_user';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class UserStateService {
     private readonly _user = signal<User | null>(this.loadUserFromStorage());
-    
+
     public readonly user = this._user.asReadonly();
 
     constructor() {
@@ -49,4 +49,3 @@ export class UserStateService {
         return this._user()?.id || null;
     }
 }
-

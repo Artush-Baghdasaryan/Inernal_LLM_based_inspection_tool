@@ -19,11 +19,13 @@ public class UsersService(IUsersRepository usersRepository) : IUsersService {
         return usersRepository.GetUserByNicknameAsync(nickname);
     }
 
-    public async Task<User> UpdateAsync(Guid id, SaveUserRequest request) {
-        var user = await usersRepository.GetByIdAsync(id);
-        if (user == null) {
+    public async Task<User> RequireByIdAsync(Guid id) {
+        return await usersRepository.GetByIdAsync(id) ??
             throw new Exception($"User with id {id} not found");
-        }
+    }
+
+    public async Task<User> UpdateAsync(Guid id, SaveUserRequest request) {
+        var user = await RequireByIdAsync(id);
 
         user.Nickname = request.Nickname;
         user.PromptSettings = request.PromptSettings;

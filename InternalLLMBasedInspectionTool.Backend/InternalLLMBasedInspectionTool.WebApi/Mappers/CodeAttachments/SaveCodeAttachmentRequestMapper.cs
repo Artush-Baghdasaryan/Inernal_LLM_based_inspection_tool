@@ -12,7 +12,7 @@ public static class SaveCodeAttachmentRequestMapper {
             CodeLanguage = requestModel.CodeLanguage,
             OriginalData = requestModel.OriginalData,
             EditedData = requestModel.EditedData,
-            DiffData = requestModel.DiffData
+            DiffHunks = requestModel.DiffHunks
         };
     }
 }

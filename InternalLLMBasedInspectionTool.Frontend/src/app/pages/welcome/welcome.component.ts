@@ -10,7 +10,7 @@ import { UserStateService } from '../../services/user-state.service';
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './welcome.component.html',
-    styleUrl: './welcome.component.scss'
+    styleUrl: './welcome.component.scss',
 })
 export class WelcomeComponent {
     private readonly router = inject(Router);
@@ -30,21 +30,23 @@ export class WelcomeComponent {
         this.isLoading = true;
         this.error = null;
 
-        this.apiService.createUser({ nickname: this.nickname.trim() }).subscribe({
-            next: (user) => {
-                if (user && user.id) {
-                    this.userStateService.setUser(user);
-                    this.router.navigate(['/editor']);
-                } else {
-                    this.error = 'Failed to create user. Please try again.';
+        this.apiService
+            .createUser({ nickname: this.nickname.trim() })
+            .subscribe({
+                next: (user) => {
+                    if (user && user.id) {
+                        this.userStateService.setUser(user);
+                        this.router.navigate(['/editor']);
+                    } else {
+                        this.error = 'Failed to create user. Please try again.';
+                        this.isLoading = false;
+                    }
+                },
+                error: (error) => {
+                    console.error('Error creating user:', error);
+                    this.error = 'Error creating user. Please try again.';
                     this.isLoading = false;
-                }
-            },
-            error: (error) => {
-                console.error('Error creating user:', error);
-                this.error = 'Error creating user. Please try again.';
-                this.isLoading = false;
-            }
-        });
+                },
+            });
     }
 }

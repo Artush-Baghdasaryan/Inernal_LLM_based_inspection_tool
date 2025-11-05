@@ -6,15 +6,15 @@ import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
     {
         path: '',
-        component: WelcomeComponent
+        component: WelcomeComponent,
     },
     {
         path: 'editor',
         component: EditorComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
     },
     {
         path: '**',
-        redirectTo: ''
-    }
+        redirectTo: '',
+    },
 ];

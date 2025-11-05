@@ -1,0 +1,251 @@
+@if (isOpen()) {
+    <div class="modal-backdrop" (click)="onBackdropClick($event)">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">Analysis Results</h2>
+                <button
+                    aria-label="Close"
+                    class="close-button"
+                    [innerHTML]="closeIcon"
+                    (click)="closeModal()"
+                ></button>
+            </div>
+            <div class="tabs-container">
+                <button
+                    class="tab-button"
+                    [class.active]="activeTab() === 'issues'"
+                    (click)="switchTab('issues')"
+                >
+                    Issues
+                    @if (getUnfixedIssuesCount() > 0) {
+                        <span class="tab-badge">{{ getUnfixedIssuesCount() }}</span>
+                    }
+                </button>
+                <button
+                    class="tab-button"
+                    [class.active]="activeTab() === 'fixed'"
+                    (click)="switchTab('fixed')"
+                >
+                    Fixed
+                    @if (getFixedIssuesCount() > 0) {
+                        <span class="tab-badge">{{ getFixedIssuesCount() }}</span>
+                    }
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (issues.length === 0) {
+                    <div class="no-issues">
+                        <p>
+                            @if (activeTab() === 'fixed') {
+                                No fixed issues yet
+                            } @else {
+                                No issues found
+                            }
+                        </p>
+                    </div>
+                } @else {
+                    @if (activeTab() === 'issues') {
+                        <div class="selection-info">
+                            <p class="info-text">
+                                Select the issues you want to fix by checking the boxes below.
+                            </p>
+                            @if (getSelectedIssuesCount() > 0) {
+                                <p class="selected-count">
+                                    {{ getSelectedIssuesCount() }} issue(s) selected
+                                </p>
+                            }
+                        </div>
+                    }
+                    <div class="issues-container">
+                        @for (issue of issues; track $index) {
+                            @if (activeTab() === 'issues') {
+                                <div
+                                    class="issue-card"
+                                    [style.border-left-color]="getIssueBorderColor(issue)"
+                                    [class.issue-selected]="isIssueSelected($index)"
+                                >
+                                    <div class="issue-checkbox-container">
+                                        <input
+                                            type="checkbox"
+                                            class="issue-checkbox"
+                                            [id]="'issue-checkbox-' + $index"
+                                            [checked]="isIssueSelected($index)"
+                                            (change)="toggleIssueSelection($index)"
+                                        />
+                                        <label
+                                            class="issue-checkbox-label"
+                                            [for]="'issue-checkbox-' + $index"
+                                        >
+                                            Select this issue
+                                        </label>
+                                    </div>
+                                    <div class="issue-header">
+                                        <h3 class="issue-title">{{ issue.title }}</h3>
+                                        <div class="issue-badges">
+                                            <span
+                                                class="badge badge-level"
+                                                [class.badge-error]="
+                                                    issue.level === 2
+                                                "
+                                                [class.badge-warning]="
+                                                    issue.level === 1
+                                                "
+                                                [class.badge-info]="
+                                                    issue.level === 0
+                                                "
+                                            >
+                                                {{ getIssueLevelLabel(issue.level) }}
+                                            </span>
+                                            <span
+                                                class="badge badge-severity"
+                                                [class.badge-high]="
+                                                    issue.severity === 2
+                                                "
+                                                [class.badge-medium]="
+                                                    issue.severity === 1
+                                                "
+                                                [class.badge-low]="
+                                                    issue.severity === 0
+                                                "
+                                            >
+                                                {{ getIssueSeverityLabel(issue.severity) }}
+                                            </span>
+                                            <span class="badge badge-category">
+                                                {{ getIssueCategoryLabel(issue.category) }}
+                                            </span>
+                                            <span class="badge badge-confidence">
+                                                Confidence: {{ getConfidencePercentage(issue.confidence) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="issue-body">
+                                        <p class="issue-description">{{ issue.description }}</p>
+                                        @if (issue.startLine || issue.codeHint) {
+                                            <div class="issue-code-location">
+                                                <h4 class="code-location-title">Code Location:</h4>
+                                                @if (issue.startLine) {
+                                                    <div class="code-location-lines">
+                                                        @if (issue.endLine && issue.endLine !== issue.startLine) {
+                                                            Lines {{ issue.startLine }}-{{ issue.endLine }}
+                                                        } @else {
+                                                            Line {{ issue.startLine }}
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (issue.codeHint) {
+                                                    <textarea
+                                                        class="code-hint-textarea"
+                                                        [value]="issue.codeHint"
+                                                        readonly
+                                                        disabled
+                                                    ></textarea>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            } @else {
+                                <div
+                                    class="issue-card issue-fixed"
+                                    [style.border-left-color]="getIssueBorderColor(issue)"
+                                >
+                                    <div class="fixed-badge">Fixed</div>
+                                    <div class="issue-header">
+                                        <h3 class="issue-title">{{ issue.title }}</h3>
+                                        <div class="issue-badges">
+                                            <span
+                                                class="badge badge-level"
+                                                [class.badge-error]="
+                                                    issue.level === 2
+                                                "
+                                                [class.badge-warning]="
+                                                    issue.level === 1
+                                                "
+                                                [class.badge-info]="
+                                                    issue.level === 0
+                                                "
+                                            >
+                                                {{ getIssueLevelLabel(issue.level) }}
+                                            </span>
+                                            <span
+                                                class="badge badge-severity"
+                                                [class.badge-high]="
+                                                    issue.severity === 2
+                                                "
+                                                [class.badge-medium]="
+                                                    issue.severity === 1
+                                                "
+                                                [class.badge-low]="
+                                                    issue.severity === 0
+                                                "
+                                            >
+                                                {{ getIssueSeverityLabel(issue.severity) }}
+                                            </span>
+                                            <span class="badge badge-category">
+                                                {{ getIssueCategoryLabel(issue.category) }}
+                                            </span>
+                                            <span class="badge badge-confidence">
+                                                Confidence: {{ getConfidencePercentage(issue.confidence) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="issue-body">
+                                        <p class="issue-description">{{ issue.description }}</p>
+                                        @if (issue.startLine || issue.codeHint) {
+                                            <div class="issue-code-location">
+                                                <h4 class="code-location-title">Code Location:</h4>
+                                                @if (issue.startLine) {
+                                                    <div class="code-location-lines">
+                                                        @if (issue.endLine && issue.endLine !== issue.startLine) {
+                                                            Lines {{ issue.startLine }}-{{ issue.endLine }}
+                                                        } @else {
+                                                            Line {{ issue.startLine }}
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (issue.codeHint) {
+                                                    <textarea
+                                                        class="code-hint-textarea"
+                                                        [value]="issue.codeHint"
+                                                        readonly
+                                                        disabled
+                                                    ></textarea>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="closeModal()">
+                    Close
+                </button>
+                @if (activeTab() === 'issues' && getSelectedIssuesCount() > 0) {
+                    <button 
+                        class="btn btn-primary btn-fix" 
+                        (click)="onFixIssuesClick()"
+                        [disabled]="isFixing()"
+                    >
+                        @if (isFixing()) {
+                            Fixing...
+                        } @else {
+                            Fix {{ getSelectedIssuesCount() }} issue(s)
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (isFixing()) {
+    <app-loading-modal
+        [isOpen]="isFixing()"
+        [message]="'Fixing issues...'"
+    ></app-loading-modal>
+}
+

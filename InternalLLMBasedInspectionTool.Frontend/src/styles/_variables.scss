@@ -17,7 +17,6 @@ $bg-secondary: rgba($bg-secondary-color, 0.6);
 $bg-header: rgba($bg-secondary-color, 0.8);
 $bg-dark-gradient: linear-gradient(135deg, $bg-dark-color 0%, $bg-secondary-color 50%, $bg-tertiary-color 100%);
 
-// Border Variables
 $border-color: rgba($primary, 0.2);
 
 // Overlay and Shadow Colors
@@ -33,9 +32,11 @@ $primary-30: rgba($primary, 0.3);
 $primary-40: rgba($primary, 0.4);
 $primary-50: rgba($primary, 0.5);
 $primary-60: rgba($primary, 0.6);
+$primary-80: rgba($primary, 0.8);
 
 // White Color with Opacity
 $white-60: rgba($white, 0.6);
+$white-70: rgba($white, 0.7);
 $white-80: rgba($white, 0.8);
 $white-90: rgba($white, 0.9);
 

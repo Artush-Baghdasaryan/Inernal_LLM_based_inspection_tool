@@ -1,6 +1,9 @@
 using InternalLLMBasedInspectionTool.Application.CodeAttachments;
+using InternalLLMBasedInspectionTool.Application.CodeAttachments.Requests;
 using InternalLLMBasedInspectionTool.Domain.Common.Security;
+using InternalLLMBasedInspectionTool.WebApi.Mappers.Analysis;
 using InternalLLMBasedInspectionTool.WebApi.Mappers.CodeAttachments;
+using InternalLLMBasedInspectionTool.WebApi.Models.Analysis;
 using InternalLLMBasedInspectionTool.WebApi.Models.CodeAttachments;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +27,12 @@ public class CodeAttachmentsController(
         return CodeAttachmentMapper.Map(codeAttachment, encryptionService);
     }
 
+    [HttpGet("{id}/form-prompt")]
+    public async Task<FormPromptResultModel> FormPrompt(Guid id, [FromQuery] Guid userId) {
+        var result = await codeAttachmentsService.FormPromptAsync(id, userId);
+        return FormPromptResultMapper.Map(result);
+    }
+
     [HttpPost]
     public async Task<CodeAttachmentModel> Create([FromBody] SaveCodeAttachmentRequestModel requestModel) {
         var request = SaveCodeAttachmentRequestMapper.Map(requestModel);
@@ -41,5 +50,27 @@ public class CodeAttachmentsController(
     [HttpDelete("{id}")]
     public Task Delete(Guid id) {
         return codeAttachmentsService.DeleteAsync(id);
+    }
+
+    [HttpPost("{id}/analyse")]
+    public async Task<AnalysisModel> Analyse(
+        Guid id,
+        [FromQuery] Guid userId,
+        [FromBody] AnalyseCodeRequestModel requestModel
+    ) {
+        var analyse = await codeAttachmentsService.AnalyseAsync(userId, id, requestModel.SystemPrompt);
+        return AnalysisMapper.Map(analyse);
+    }
+
+    [HttpPost("fix-code")]
+    public async Task<FixCodeResultModel> FixCode([FromBody] FixCodeRequestModel requestModel) {
+        var request = FixCodeRequestMapper.Map(requestModel);
+        var result = await codeAttachmentsService.FixCodeAsync(request);
+        return FixCodeResultMapper.Map(result);
+    }
+
+    [HttpPost("mark-issues-as-fixed")]
+    public async Task MarkIssuesAsFixed([FromBody] MarkIssuesAsFixedRequestModel requestModel) {
+        await codeAttachmentsService.MarkIssuesAsFixedAsync(requestModel.AttachmentId, requestModel.IssueIndices);
     }
 }

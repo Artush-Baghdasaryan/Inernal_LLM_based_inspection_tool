@@ -4,4 +4,5 @@ namespace InternalLLMBasedInspectionTool.Domain.Analysis;
 
 public interface IAnalysisRepository : IRepository<Analyse> {
     Task<Analyse?> GetByAttachmentIdAsync(Guid attachmentId);
+    Task DeleteByAttachmentIdAsync(Guid attachmentId);
 }

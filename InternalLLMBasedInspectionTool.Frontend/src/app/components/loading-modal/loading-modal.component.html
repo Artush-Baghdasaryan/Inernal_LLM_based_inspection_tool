@@ -1,0 +1,19 @@
+@if (isOpen()) {
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <div class="loading-content">
+                <h3 class="loading-title">{{ message() }}</h3>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            [style.width.%]="progress()"
+                        ></div>
+                    </div>
+                    <span class="progress-text">{{ progress() | number: '1.0-0' }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

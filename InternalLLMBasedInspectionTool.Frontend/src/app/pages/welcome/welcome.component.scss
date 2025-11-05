@@ -1,499 +1,590 @@
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 // Keyframes definitions at top level
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    opacity: 0.6;
-  }
-  25% {
-    transform: translate(100px, -100px) rotate(90deg) scale(1.1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translate(-50px, -200px) rotate(180deg) scale(0.9);
-    opacity: 0.4;
-  }
-  75% {
-    transform: translate(-150px, -50px) rotate(270deg) scale(1.05);
-    opacity: 0.7;
-  }
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0.6;
+    }
+    25% {
+        transform: translate(100px, -100px) rotate(90deg) scale(1.1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-50px, -200px) rotate(180deg) scale(0.9);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translate(-150px, -50px) rotate(270deg) scale(1.05);
+        opacity: 0.7;
+    }
 }
 
 @keyframes orbFloat {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(100px, -100px) scale(1.1);
-  }
-  66% {
-    transform: translate(-100px, 100px) scale(0.9);
-  }
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(100px, -100px) scale(1.1);
+    }
+    66% {
+        transform: translate(-100px, 100px) scale(0.9);
+    }
 }
 
 @keyframes logoPulse {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05) rotate(5deg);
-    opacity: 0.95;
-  }
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05) rotate(5deg);
+        opacity: 0.95;
+    }
 }
 
 @keyframes glowPulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    opacity: 0.8;
-  }
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.8;
+    }
 }
 
 @keyframes titleFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 @keyframes buttonFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 // Mixins
 @mixin gradient-text($color1, $color2, $color3) {
-  color: $color1;
-  text-shadow: 0 0 20px $primary-50;
-  
-  @supports (-webkit-background-clip: text) or (background-clip: text) {
-    background: linear-gradient(135deg, $color1 0%, $color2 50%, $color3 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
+    color: $color1;
+    text-shadow: 0 0 20px $primary-50;
+
+    @supports (-webkit-background-clip: text) or (background-clip: text) {
+        background: linear-gradient(
+            135deg,
+            $color1 0%,
+            $color2 50%,
+            $color3 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
 }
 
 @mixin fade-in($delay: 0s, $translateY: 30px) {
-  animation: fadeIn 1s ease-out $delay both;
+    animation: fadeIn 1s ease-out $delay both;
 }
 
 @mixin center-absolute {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 @mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .welcome-page {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  @include flex-center;
-  overflow: hidden;
-  background: $bg-dark-gradient;
-
-  .animated-background {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 0;
-
-    .floating-shapes {
-      position: relative;
-      width: 100%;
-      height: 100%;
-
-      .shape {
-        position: absolute;
-        border-radius: 50%;
-        background: linear-gradient(135deg, $primary-15, $secondary-15);
-        border: 1px solid $primary-30;
-        animation: float 20s infinite ease-in-out;
-        opacity: 0.6;
-        backdrop-filter: blur(10px);
-
-        &:nth-child(odd) {
-          animation-duration: 25s;
-          background: linear-gradient(135deg, $secondary-15, $accent-15);
-          border-color: $secondary-30;
-        }
-
-        &:nth-child(3n) {
-          animation-duration: 30s;
-        }
-
-        &:nth-child(4n) {
-          animation-duration: 18s;
-        }
-      }
-
-      // Generate shape positions using @each
-      $shapes: (
-        1: (top: 10%, left: 10%, size: 60px),
-        2: (top: 20%, right: 15%, size: 80px),
-        3: (top: 50%, left: 5%, size: 40px),
-        4: (top: 60%, right: 20%, size: 70px),
-        5: (bottom: 20%, left: 15%, size: 90px),
-        6: (bottom: 15%, right: 10%, size: 50px),
-        7: (top: 30%, left: 50%, size: 65px),
-        8: (bottom: 40%, left: 40%, size: 75px),
-        9: (top: 70%, right: 30%, size: 55px),
-        10: (bottom: 10%, left: 60%, size: 85px),
-        11: (top: 15%, left: 30%, size: 45px),
-        12: (top: 45%, right: 5%, size: 60px),
-        13: (bottom: 30%, right: 40%, size: 70px),
-        14: (top: 80%, left: 25%, size: 50px),
-        15: (bottom: 5%, right: 50%, size: 80px)
-      );
-
-      @each $num, $props in $shapes {
-        .shape-#{$num} {
-          @each $prop, $value in $props {
-            @if $prop == size {
-              width: $value;
-              height: $value;
-            } @else {
-              #{$prop}: $value;
-            }
-          }
-        }
-      }
-    }
-
-    .gradient-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.3;
-      animation: orbFloat 15s infinite ease-in-out;
-
-      &.orb-1 {
-        width: 400px;
-        height: 400px;
-        background: linear-gradient(135deg, $primary, $secondary);
-        top: -200px;
-        left: -200px;
-        animation-duration: 20s;
-      }
-
-      &.orb-2 {
-        width: 350px;
-        height: 350px;
-        background: linear-gradient(135deg, $secondary, $accent);
-        bottom: -150px;
-        right: -150px;
-        animation-duration: 25s;
-        animation-delay: -5s;
-      }
-
-      &.orb-3 {
-        width: 300px;
-        height: 300px;
-        background: linear-gradient(135deg, $accent, $primary);
-        @include center-absolute;
-        animation-duration: 18s;
-        animation-delay: -10s;
-      }
-    }
-  }
-
-  .welcome-content {
     position: relative;
-    z-index: 10;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-    @include fade-in;
-
-    .logo-container {
-      margin-bottom: 1rem;
-      @include flex-center;
-      position: relative;
-      width: 100%;
-
-      .logo-wrapper {
-        position: relative;
-        display: inline-block;
-
-        .logo-icon {
-          color: $primary;
-          filter: drop-shadow(0 0 30px $primary-60);
-          animation: logoPulse 3s ease-in-out infinite;
-          position: relative;
-          z-index: 2;
-        }
-
-        .logo-glow {
-          @include center-absolute;
-          width: 140px;
-          height: 140px;
-          background: radial-gradient(circle, $primary-40 0%, transparent 70%);
-          border-radius: 50%;
-          animation: glowPulse 2s ease-in-out infinite;
-          z-index: 1;
-        }
-      }
-    }
-
-    .welcome-title {
-      font-size: 4rem;
-      font-weight: 700;
-      margin: 0 auto;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      text-align: center;
-      animation: titleFadeIn 1s ease-out 0.2s both;
-      position: relative;
-      z-index: 2;
-
-      .title-line {
-        display: block;
-        text-align: center;
-        width: 100%;
-        animation: slideInLeft 0.8s ease-out both;
-        opacity: 1 !important;
-        position: relative;
-        font-weight: 700;
-        
-        @include gradient-text($primary, $secondary, $accent);
-
-        &:nth-child(2) {
-          animation-delay: 0.3s;
-          @include gradient-text($secondary, $accent, $primary);
-        }
-      }
-    }
-
-    .welcome-description {
-      font-size: 1.25rem;
-      color: $white-80;
-      line-height: 1.8;
-      margin: 0 auto 2rem;
-      font-weight: 300;
-      text-align: center;
-      max-width: 600px;
-      width: 100%;
-      @include fade-in(0.4s, 15px);
-    }
-
-    .input-container {
-      margin-bottom: 1.5rem;
-      width: 100%;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      @include fade-in(0.5s, 20px);
-
-      .nickname-input {
-        width: 100%;
-        padding: 1rem 1.5rem;
-        font-size: 1.125rem;
-        color: $white;
-        background: rgba($white, 0.1);
-        border: 2px solid $primary-30;
-        border-radius: 0.875rem;
-        outline: none;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        font-weight: 400;
-
-        &::placeholder {
-          color: $white-60;
-        }
-
-        &:focus {
-          border-color: $primary;
-          background: rgba($white, 0.15);
-          box-shadow: 0 4px 24px $shadow-primary;
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-
-      .error-message {
-        margin-top: 0.75rem;
-        color: $accent;
-        font-size: 0.875rem;
-        text-align: center;
-        animation: fadeIn 0.3s ease;
-      }
-    }
-
-    .start-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 1.125rem 2.75rem;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: $white;
-      background: linear-gradient(135deg, $primary, $secondary);
-      border: none;
-      border-radius: 0.875rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 32px $shadow-primary;
-      position: relative;
-      overflow: hidden;
-      animation: buttonFadeIn 1s ease-out 0.6s both;
-      z-index: 1;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, $white-30, transparent);
-        transition: left 0.6s;
-        z-index: -1;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 0.875rem;
-        padding: 2px;
-        background: linear-gradient(135deg, $primary, $secondary, $accent);
-        -webkit-mask: linear-gradient($white 0 0) content-box, linear-gradient($white 0 0);
-        -webkit-mask-composite: xor;
-        mask: linear-gradient($white 0 0) content-box, linear-gradient($white 0 0);
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: -1;
-      }
-
-      &:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 48px $primary-60;
-        
-        &::before {
-          left: 100%;
-        }
-
-        &::after {
-          opacity: 1;
-        }
-
-        svg {
-          transform: translateX(5px);
-        }
-      }
-
-      &:active {
-        transform: translateY(-1px);
-      }
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-
-        &:hover {
-          transform: none;
-          box-shadow: 0 8px 32px $shadow-primary;
-        }
-      }
-
-      svg {
-        transition: transform 0.3s ease;
-      }
-    }
-  }
-
-  @media (max-width: 768px) {
-    .welcome-content {
-      .welcome-title {
-        font-size: 2.75rem;
-      }
-
-      .welcome-description {
-        font-size: 1.125rem;
-      }
-
-      .start-button {
-        padding: 1rem 2.25rem;
-        font-size: 1rem;
-      }
-    }
+    width: 100vw;
+    height: 100vh;
+    @include flex-center;
+    overflow: hidden;
+    background: $bg-dark-gradient;
 
     .animated-background {
-      .floating-shapes {
-        .shape {
-          display: none;
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        z-index: 0;
 
-          &.shape-1,
-          &.shape-2,
-          &.shape-3,
-          &.shape-4,
-          &.shape-5 {
-            display: block;
-          }
+        .floating-shapes {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
+            .shape {
+                position: absolute;
+                border-radius: 50%;
+                background: linear-gradient(135deg, $primary-15, $secondary-15);
+                border: 1px solid $primary-30;
+                animation: float 20s infinite ease-in-out;
+                opacity: 0.6;
+                backdrop-filter: blur(10px);
+
+                &:nth-child(odd) {
+                    animation-duration: 25s;
+                    background: linear-gradient(
+                        135deg,
+                        $secondary-15,
+                        $accent-15
+                    );
+                    border-color: $secondary-30;
+                }
+
+                &:nth-child(3n) {
+                    animation-duration: 30s;
+                }
+
+                &:nth-child(4n) {
+                    animation-duration: 18s;
+                }
+            }
+
+            // Generate shape positions using @each
+            $shapes: (
+                1: (
+                    top: 10%,
+                    left: 10%,
+                    size: 60px,
+                ),
+                2: (
+                    top: 20%,
+                    right: 15%,
+                    size: 80px,
+                ),
+                3: (
+                    top: 50%,
+                    left: 5%,
+                    size: 40px,
+                ),
+                4: (
+                    top: 60%,
+                    right: 20%,
+                    size: 70px,
+                ),
+                5: (
+                    bottom: 20%,
+                    left: 15%,
+                    size: 90px,
+                ),
+                6: (
+                    bottom: 15%,
+                    right: 10%,
+                    size: 50px,
+                ),
+                7: (
+                    top: 30%,
+                    left: 50%,
+                    size: 65px,
+                ),
+                8: (
+                    bottom: 40%,
+                    left: 40%,
+                    size: 75px,
+                ),
+                9: (
+                    top: 70%,
+                    right: 30%,
+                    size: 55px,
+                ),
+                10: (
+                    bottom: 10%,
+                    left: 60%,
+                    size: 85px,
+                ),
+                11: (
+                    top: 15%,
+                    left: 30%,
+                    size: 45px,
+                ),
+                12: (
+                    top: 45%,
+                    right: 5%,
+                    size: 60px,
+                ),
+                13: (
+                    bottom: 30%,
+                    right: 40%,
+                    size: 70px,
+                ),
+                14: (
+                    top: 80%,
+                    left: 25%,
+                    size: 50px,
+                ),
+                15: (
+                    bottom: 5%,
+                    right: 50%,
+                    size: 80px,
+                ),
+            );
+
+            @each $num, $props in $shapes {
+                .shape-#{$num} {
+                    @each $prop, $value in $props {
+                        @if $prop == size {
+                            width: $value;
+                            height: $value;
+                        } @else {
+                            #{$prop}: $value;
+                        }
+                    }
+                }
+            }
         }
-      }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: orbFloat 15s infinite ease-in-out;
+
+            &.orb-1 {
+                width: 400px;
+                height: 400px;
+                background: linear-gradient(135deg, $primary, $secondary);
+                top: -200px;
+                left: -200px;
+                animation-duration: 20s;
+            }
+
+            &.orb-2 {
+                width: 350px;
+                height: 350px;
+                background: linear-gradient(135deg, $secondary, $accent);
+                bottom: -150px;
+                right: -150px;
+                animation-duration: 25s;
+                animation-delay: -5s;
+            }
+
+            &.orb-3 {
+                width: 300px;
+                height: 300px;
+                background: linear-gradient(135deg, $accent, $primary);
+                @include center-absolute;
+                animation-duration: 18s;
+                animation-delay: -10s;
+            }
+        }
     }
-  }
+
+    .welcome-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+        @include fade-in;
+
+        .logo-container {
+            margin-bottom: 1rem;
+            @include flex-center;
+            position: relative;
+            width: 100%;
+
+            .logo-wrapper {
+                position: relative;
+                display: inline-block;
+
+                .logo-icon {
+                    color: $primary;
+                    filter: drop-shadow(0 0 30px $primary-60);
+                    animation: logoPulse 3s ease-in-out infinite;
+                    position: relative;
+                    z-index: 2;
+                }
+
+                .logo-glow {
+                    @include center-absolute;
+                    width: 140px;
+                    height: 140px;
+                    background: radial-gradient(
+                        circle,
+                        $primary-40 0%,
+                        transparent 70%
+                    );
+                    border-radius: 50%;
+                    animation: glowPulse 2s ease-in-out infinite;
+                    z-index: 1;
+                }
+            }
+        }
+
+        .welcome-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 0 auto;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-align: center;
+            animation: titleFadeIn 1s ease-out 0.2s both;
+            position: relative;
+            z-index: 2;
+
+            .title-line {
+                display: block;
+                text-align: center;
+                width: 100%;
+                animation: slideInLeft 0.8s ease-out both;
+                opacity: 1 !important;
+                position: relative;
+                font-weight: 700;
+
+                @include gradient-text($primary, $secondary, $accent);
+
+                &:nth-child(2) {
+                    animation-delay: 0.3s;
+                    @include gradient-text($secondary, $accent, $primary);
+                }
+            }
+        }
+
+        .welcome-description {
+            font-size: 1.25rem;
+            color: $white-80;
+            line-height: 1.8;
+            margin: 0 auto 2rem;
+            font-weight: 300;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            @include fade-in(0.4s, 15px);
+        }
+
+        .input-container {
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            @include fade-in(0.5s, 20px);
+
+            .nickname-input {
+                width: 100%;
+                padding: 1rem 1.5rem;
+                font-size: 1.125rem;
+                color: $white;
+                background: rgba($white, 0.1);
+                border: 2px solid $primary-30;
+                border-radius: 0.875rem;
+                outline: none;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                font-weight: 400;
+
+                &::placeholder {
+                    color: $white-60;
+                }
+
+                &:focus {
+                    border-color: $primary;
+                    background: rgba($white, 0.15);
+                    box-shadow: 0 4px 24px $shadow-primary;
+                }
+
+                &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+            }
+
+            .error-message {
+                margin-top: 0.75rem;
+                color: $accent;
+                font-size: 0.875rem;
+                text-align: center;
+                animation: fadeIn 0.3s ease;
+            }
+        }
+
+        .start-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.125rem 2.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: $white;
+            background: linear-gradient(135deg, $primary, $secondary);
+            border: none;
+            border-radius: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px $shadow-primary;
+            position: relative;
+            overflow: hidden;
+            animation: buttonFadeIn 1s ease-out 0.6s both;
+            z-index: 1;
+
+            &::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    $white-30,
+                    transparent
+                );
+                transition: left 0.6s;
+                z-index: -1;
+            }
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: 0.875rem;
+                padding: 2px;
+                background: linear-gradient(
+                    135deg,
+                    $primary,
+                    $secondary,
+                    $accent
+                );
+                -webkit-mask:
+                    linear-gradient($white 0 0) content-box,
+                    linear-gradient($white 0 0);
+                -webkit-mask-composite: xor;
+                mask:
+                    linear-gradient($white 0 0) content-box,
+                    linear-gradient($white 0 0);
+                mask-composite: exclude;
+                opacity: 0;
+                transition: opacity 0.3s;
+                z-index: -1;
+            }
+
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 48px $primary-60;
+
+                &::before {
+                    left: 100%;
+                }
+
+                &::after {
+                    opacity: 1;
+                }
+
+                svg {
+                    transform: translateX(5px);
+                }
+            }
+
+            &:active {
+                transform: translateY(-1px);
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+
+                &:hover {
+                    transform: none;
+                    box-shadow: 0 8px 32px $shadow-primary;
+                }
+            }
+
+            svg {
+                transition: transform 0.3s ease;
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .welcome-content {
+            .welcome-title {
+                font-size: 2.75rem;
+            }
+
+            .welcome-description {
+                font-size: 1.125rem;
+            }
+
+            .start-button {
+                padding: 1rem 2.25rem;
+                font-size: 1rem;
+            }
+        }
+
+        .animated-background {
+            .floating-shapes {
+                .shape {
+                    display: none;
+
+                    &.shape-1,
+                    &.shape-2,
+                    &.shape-3,
+                    &.shape-4,
+                    &.shape-5 {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
 }

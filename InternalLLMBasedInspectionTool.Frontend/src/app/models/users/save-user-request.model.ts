@@ -4,4 +4,3 @@ export interface SaveUserRequest {
     nickname: string;
     promptSettings: PromptSettings;
 }
-

@@ -1,165 +1,160 @@
 <div class="code-editor">
-  <div class="editor-header">
-    <div class="editor-header-left">
-      <label class="upload-button">
-        <input 
-          type="file"
-          accept=".ts,.js,.py,.java,.cpp,.cs,.go,.rs,.html,.css,.json,.yaml,.yml,.txt"
-          class="file-input"
-          (change)="onFileSelected($event)"
-        />
-        Upload Code
-      </label>
-      <button 
-        class="load-sample-button"
-        (click)="onLoadSampleClick()"
-      >
-        Load Sample Code
-      </button>
-      <button 
-        class="see-diff-button"
-        (click)="onSeeDiff()"
-      >
-        See Diff
-      </button>
-    </div>
-    <div class="editor-header-right">
-      <button 
-        aria-label="Prompt settings"
-        title="Prompt settings"
-        class="prompt-settings-button"
-        [innerHTML]="promptSettingsIcon"
-        (click)="onPromptSettingsClick()"
-      ></button>
-      <button 
-        class="form-prompt-button"
-        [disabled]="!hasDiff()"
-        (click)="onFormPrompt()"
-      >
-        Form a prompt
-      </button>
-    </div>
-  </div>
-  <div class="editor-container">
-      @if (isMonacoLoading()) {
-        <div class="loading-overlay">
-          <div class="loading-spinner">
-            <div class="spinner"></div>
-            <p class="loading-text">Loading editor...</p>
-          </div>
-        </div>
-      }
-      @if (!hasCodeUploaded() && !isMonacoLoading()) {
-        <div class="empty-editor-state">
-          <div class="empty-state-content">
-            <div class="empty-state-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-            </div>
-            <h3 class="empty-state-title">No Code Loaded</h3>
-            <p class="empty-state-description">
-              Upload your code file or load a sample to get started with code analysis.
-            </p>
-            <div class="empty-state-actions">
-              <label class="upload-code-button">
-                <input 
-                  type="file"
-                  accept=".ts,.js,.py,.java,.cpp,.cs,.go,.rs,.html,.css,.json,.yaml,.yml,.txt"
-                  class="file-input"
-                  (change)="onFileSelected($event)"
+    <div class="editor-header">
+        <div class="editor-header-left">
+            <label class="upload-button">
+                <input
+                    type="file"
+                    accept=".ts,.js,.py,.java,.kt,.kts,.cpp,.cs,.go,.rs,.html,.css,.json,.yaml,.yml,.txt"
+                    class="file-input"
+                    (change)="onFileSelected($event)"
                 />
-                Upload Code File
-              </label>
-              <button 
-                class="load-sample-button"
-                (click)="onLoadSampleClick()"
-              >
+                Upload Code
+            </label>
+            <button class="load-sample-button" (click)="onLoadSampleClick()">
                 Load Sample Code
-              </button>
-            </div>
-          </div>
+            </button>
+            <button class="see-diff-button" (click)="onSeeDiff()">
+                See Diff
+            </button>
         </div>
-      }
-      <div 
-        #editorContainer
-        class="monaco-container"
-        [class.hidden]="isMonacoLoading() || !hasCodeUploaded()"
-      ></div>
+        <div class="editor-header-right">
+            <button
+                class="form-prompt-button"
+                [disabled]="!hasDiff() || isFormingPrompt()"
+                (click)="onFormPrompt()"
+            >
+                @if (isFormingPrompt()) {
+                    <span>Loading...</span>
+                } @else {
+                    <span>Form a prompt</span>
+                }
+            </button>
+            @if (isFileLoading()) {
+                <div class="loading-indicator">Loading file...</div>
+            }
+        </div>
     </div>
-  
-  @if (showDiffModal()) {
-    <app-diff-modal
-      [originalContent]="originalContent()"
-      [editedContent]="editorContent()"
-      [language]="selectedLanguage()"
-      [isOpen]="showDiffModal()"
-      [onClose]="closeDiffModal.bind(this)"
-    ></app-diff-modal>
+    <div class="editor-container">
+        @if (isMonacoLoading()) {
+            <div class="loading-overlay">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Loading editor...</p>
+                </div>
+            </div>
+        }
+        @if (!hasCodeUploaded() && !isMonacoLoading()) {
+            <div class="empty-editor-state">
+                <div class="empty-state-content">
+                    <div class="empty-state-icon">
+                        <svg
+                            width="64"
+                            height="64"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                            />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-state-title">No Code Loaded</h3>
+                    <p class="empty-state-description">
+                        Upload your code file or load a sample to get started
+                        with code analysis.
+                    </p>
+                    <div class="empty-state-actions">
+                        <label class="upload-code-button">
+                            <input
+                                type="file"
+                                accept=".ts,.js,.py,.java,.kt,.kts,.cpp,.cs,.go,.rs,.html,.css,.json,.yaml,.yml,.txt"
+                                class="file-input"
+                                (change)="onFileSelected($event)"
+                            />
+                            Upload Code File
+                        </label>
+                        <button
+                            class="load-sample-button"
+                            (click)="onLoadSampleClick()"
+                        >
+                            Load Sample Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+        <div
+            #editorContainer
+            class="monaco-container"
+            [class.hidden]="isMonacoLoading() || !hasCodeUploaded()"
+        ></div>
+    </div>
+
+    @if (showDiffModal()) {
+        <app-diff-modal
+            [originalContent]="originalContent()"
+            [editedContent]="editorContent()"
+            [language]="selectedLanguage()"
+            [isOpen]="showDiffModal()"
+            [onClose]="closeDiffModal.bind(this)"
+            (onMerge)="onMergeToOriginal()"
+        ></app-diff-modal>
+    }
+
+    @if (showLoadSampleModal()) {
+        <div class="modal-backdrop" (click)="closeLoadSampleModal()">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2 class="modal-title">Load Sample Code</h2>
+                    <button
+                        aria-label="Close"
+                        class="close-button"
+                        [innerHTML]="closeIcon"
+                        (click)="closeLoadSampleModal()"
+                    ></button>
+                </div>
+                <div class="modal-body">
+                    <div class="language-selection">
+                        <p class="language-selection-title">
+                            Select a language:
+                        </p>
+                        <div class="language-grid">
+                            @for (lang of languages; track lang.value) {
+                                <button
+                                    class="language-option"
+                                    (click)="onLoadSampleCode(lang.value)"
+                                >
+                                    {{ lang.label }}
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+  @if (showPromptModal()) {
+    <app-prompt-modal
+      [systemPrompt]="systemPrompt()"
+      [userPrompt]="userPrompt()"
+      [isOpen]="showPromptModal()"
+      [onClose]="closePromptModal.bind(this)"
+      (onAnalyse)="onAnalyse($event)"
+    ></app-prompt-modal>
   }
 
-  @if (showPromptSettingsModal()) {
-    <div 
-      class="modal-backdrop"
-      (click)="closePromptSettingsModal()"
-    >
-      <div 
-        class="modal-content"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="modal-header">
-          <h2 class="modal-title">Prompt settings</h2>
-          <button 
-            aria-label="Close"
-            class="close-button"
-            [innerHTML]="closeIcon"
-            (click)="closePromptSettingsModal()"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <!-- Content will be added here -->
-        </div>
-      </div>
-    </div>
-  }
 
-  @if (showLoadSampleModal()) {
-    <div 
-      class="modal-backdrop"
-      (click)="closeLoadSampleModal()"
-    >
-      <div 
-        class="modal-content"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="modal-header">
-          <h2 class="modal-title">Load Sample Code</h2>
-          <button 
-            aria-label="Close"
-            class="close-button"
-            [innerHTML]="closeIcon"
-            (click)="closeLoadSampleModal()"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <div class="language-selection">
-            <p class="language-selection-title">Select a language:</p>
-            <div class="language-grid">
-              @for (lang of languages; track lang.value) {
-                <button 
-                  class="language-option"
-                  (click)="onLoadSampleCode(lang.value)"
-                >
-                  {{ lang.label }}
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  @if (isAnalyzing()) {
+    <app-loading-modal
+      [isOpen]="isAnalyzing()"
+      message="Analyzing code..."
+    ></app-loading-modal>
   }
 </div>
-

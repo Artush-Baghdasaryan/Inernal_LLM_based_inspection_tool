@@ -1,16 +1,7 @@
-<div 
-    class="attachments-panel"
-    [class.collapsed]="isCollapsed"
->
-    <button 
-        class="panel-header"
-        (click)="toggleCollapse()"
-    >
+<div class="attachments-panel" [class.collapsed]="isCollapsed">
+    <button class="panel-header" (click)="toggleCollapse()">
         <span class="panel-title">Files</span>
-        <div 
-            class="chevron-icon"
-            [innerHTML]="chevronIcon"
-        ></div>
+        <div class="chevron-icon" [innerHTML]="chevronIcon"></div>
     </button>
 
     @if (!isCollapsed) {
@@ -22,24 +13,31 @@
             } @else {
                 <div class="attachments-list">
                     @for (attachment of attachments(); track attachment.id) {
-                        <div 
+                        <div
                             class="attachment-item"
-                            [class.hovered]="hoveredAttachmentId === attachment.id"
-                            [class.active]="currentAttachmentId() === attachment.id"
+                            [class.hovered]="
+                                hoveredAttachmentId === attachment.id
+                            "
+                            [class.active]="
+                                currentAttachmentId() === attachment.id
+                            "
                             (click)="onAttachmentClick(attachment)"
                             (mouseenter)="onItemMouseEnter(attachment.id)"
                             (mouseleave)="onItemMouseLeave()"
                         >
-                            <span class="attachment-name">{{ attachment.name }}</span>
-                            @if (hoveredAttachmentId === attachment.id) {
-                                <button 
-                                    class="remove-button"
-                                    aria-label="Remove"
-                                    (click)="onRemoveClick($event, attachment)"
-                                >
-                                    <div [innerHTML]="removeIcon"></div>
-                                </button>
-                            }
+                            <span class="attachment-name">{{
+                                attachment.name
+                            }}</span>
+                            <button
+                                class="remove-button"
+                                [class.visible]="
+                                    hoveredAttachmentId === attachment.id
+                                "
+                                aria-label="Remove"
+                                (click)="onRemoveClick($event, attachment)"
+                            >
+                                <div [innerHTML]="removeIcon"></div>
+                            </button>
                         </div>
                     }
                 </div>
@@ -47,4 +45,3 @@
         </div>
     }
 </div>
-

@@ -13,5 +13,5 @@ public class CodeAttachment : AuditableEntity {
     public required CodeLanguage CodeLanguage { get; set; }
     public required string OriginalDataHashed { get; set; }
     public required string EditedDataHashed { get; set; }
-    public required string DiffDataHashed { get; set; }
+    public required List<string> DiffHunks { get; set; }
 }

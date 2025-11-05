@@ -28,4 +28,6 @@ public class PromptSettings {
             DeterminismLevel = 1.0,
         };
     }
+
+    public double Temperature => 1.0 - DeterminismLevel;
 }

@@ -7,7 +7,7 @@ import { ToastService } from '../../services/toast.service';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './toast.component.html',
-    styleUrl: './toast.component.scss'
+    styleUrl: './toast.component.scss',
 })
 export class ToastComponent {
     private readonly toastService = inject(ToastService);
@@ -17,4 +17,3 @@ export class ToastComponent {
         this.toastService.remove(id);
     }
 }
-

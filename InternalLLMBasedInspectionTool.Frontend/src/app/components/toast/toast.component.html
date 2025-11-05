@@ -1,13 +1,13 @@
 <div class="toast-container">
     @for (toast of toasts(); track toast.id) {
-        <div 
+        <div
             class="toast"
             [class.success]="toast.type === 'success'"
             [class.error]="toast.type === 'error'"
             [class.info]="toast.type === 'info'"
         >
             <span class="toast-message">{{ toast.message }}</span>
-            <button 
+            <button
                 class="toast-close"
                 (click)="remove(toast.id)"
                 aria-label="Close"
@@ -17,4 +17,3 @@
         </div>
     }
 </div>
-

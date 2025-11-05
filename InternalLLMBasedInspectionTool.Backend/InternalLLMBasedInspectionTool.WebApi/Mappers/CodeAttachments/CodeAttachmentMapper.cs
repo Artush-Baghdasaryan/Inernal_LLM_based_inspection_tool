@@ -19,8 +19,7 @@ public static class CodeAttachmentMapper {
             MimeType = codeAttachment.MimeType,
             CodeLanguage = codeAttachment.CodeLanguage,
             OriginalData = encryptionService.Decrypt(codeAttachment.OriginalDataHashed),
-            EditedData = encryptionService.Decrypt(codeAttachment.EditedDataHashed),
-            DiffData = encryptionService.Decrypt(codeAttachment.DiffDataHashed)
+            EditedData = encryptionService.Decrypt(codeAttachment.EditedDataHashed)
         };
     }
 }

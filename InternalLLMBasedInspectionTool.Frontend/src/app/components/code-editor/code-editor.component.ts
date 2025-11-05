@@ -1,32 +1,57 @@
-import { Component, OnInit, OnDestroy, signal, viewChild, effect, ElementRef, inject, output } from '@angular/core';
+import {
+    Component,
+    OnInit,
+    OnDestroy,
+    signal,
+    viewChild,
+    effect,
+    ElementRef,
+    inject,
+    output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { firstValueFrom } from 'rxjs';
 import loader from '@monaco-editor/loader';
 import type * as Monaco from 'monaco-editor';
 import { DiffModalComponent } from '../diff-modal/diff-modal.component';
+import { PromptModalComponent } from '../prompt-modal/prompt-modal.component';
+import { LoadingModalComponent } from '../loading-modal/loading-modal.component';
 import { SvgIcons } from '../../shared/svg-icons';
 import { CodeAttachmentsService } from '../../services/code-attachments.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ToastService } from '../../services/toast.service';
 import { SaveCodeAttachmentRequest } from '../../models/code-attachments/save-code-attachment-request.model';
+import { calculateUnifiedDiff } from '../../utils/diff-calculator.util';
 import { CodeAttachment } from '../../models/code-attachments/code-attachment.model';
-import { mapLanguageToCodeLanguage, mapCodeLanguageToLanguage } from '../../utils/language-mapper.util';
+import {
+    mapLanguageToCodeLanguage,
+    mapCodeLanguageToLanguage,
+} from '../../utils/language-mapper.util';
 import { detectLanguageFromFile } from '../../utils/language-detector.util';
+import { Analysis } from '../../models/analysis/analysis.model';
+import { AnalyseCodeRequest } from '../../models/analysis/analyse-code-request.model';
 
 @Component({
-  selector: 'app-code-editor',
-  standalone: true,
-  imports: [CommonModule, FormsModule, DiffModalComponent],
-  templateUrl: './code-editor.component.html',
-  styleUrl: './code-editor.component.scss'
+    selector: 'app-code-editor',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        DiffModalComponent,
+        PromptModalComponent,
+        LoadingModalComponent,
+    ],
+    templateUrl: './code-editor.component.html',
+    styleUrl: './code-editor.component.scss',
 })
 export class CodeEditorComponent implements OnInit, OnDestroy {
     public readonly attachmentCreated = output<void>();
-    
-    public editorContainer = viewChild<ElementRef<HTMLDivElement>>('editorContainer');
-    
+    public readonly analysisCompleted = output<Analysis>();
+
+    public editorContainer =
+        viewChild<ElementRef<HTMLDivElement>>('editorContainer');
+
     public selectedLanguage = signal<string>('typescript');
     public editorContent = signal<string>('');
     public originalContent = signal<string>('');
@@ -36,49 +61,60 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
     private monaco = signal<typeof Monaco | null>(null);
     private pendingContent = signal<string | null>(null);
     private _currentAttachmentId = signal<string | null>(null);
-    public readonly currentAttachmentId = this._currentAttachmentId.asReadonly();
+    public readonly currentAttachmentId =
+        this._currentAttachmentId.asReadonly();
     private currentAttachmentName: string | null = null;
     private currentAttachmentMimeType: string | null = null;
     private saveTimeout: ReturnType<typeof setTimeout> | null = null;
-    public showDiffModal = signal<boolean>(false);    
-    public showPromptSettingsModal = signal<boolean>(false);
+    public showDiffModal = signal<boolean>(false);
     public showLoadSampleModal = signal<boolean>(false);
+    public showPromptModal = signal<boolean>(false);
+    public systemPrompt = signal<string>('');
+    public userPrompt = signal<string>('');
     public isMonacoLoading = signal<boolean>(true);
-    
+    public isFormingPrompt = signal<boolean>(false);
+    public isFileLoading = signal<boolean>(false);
+    public isAnalyzing = signal<boolean>(false);
+
     private readonly codeAttachmentsService = inject(CodeAttachmentsService);
     private readonly userStateService = inject(UserStateService);
     private readonly toastService = inject(ToastService);
-    
-    public readonly promptSettingsIcon: SafeHtml;
+
     public readonly closeIcon: SafeHtml;
-  
+
     public readonly languages = [
-    { value: 'typescript', label: 'TypeScript' },
-    { value: 'javascript', label: 'JavaScript' },
-    { value: 'python', label: 'Python' },
-    { value: 'java', label: 'Java' },
-    { value: 'cpp', label: 'C++' },
-    { value: 'csharp', label: 'C#' },
-    { value: 'go', label: 'Go' },
-    { value: 'rust', label: 'Rust' },
-    { value: 'html', label: 'HTML' },
-    { value: 'css', label: 'CSS' },
-    { value: 'json', label: 'JSON' },
-    { value: 'yaml', label: 'YAML' },
-    { value: 'plaintext', label: 'Other' }
-  ];
+        { value: 'typescript', label: 'TypeScript' },
+        { value: 'javascript', label: 'JavaScript' },
+        { value: 'python', label: 'Python' },
+        { value: 'java', label: 'Java' },
+        { value: 'kotlin', label: 'Kotlin' },
+        { value: 'cpp', label: 'C++' },
+        { value: 'csharp', label: 'C#' },
+        { value: 'go', label: 'Go' },
+        { value: 'rust', label: 'Rust' },
+        { value: 'html', label: 'HTML' },
+        { value: 'css', label: 'CSS' },
+        { value: 'json', label: 'JSON' },
+        { value: 'yaml', label: 'YAML' },
+        { value: 'plaintext', label: 'Other' },
+    ];
 
     constructor(private readonly sanitizer: DomSanitizer) {
-        this.promptSettingsIcon = this.sanitizer.bypassSecurityTrustHtml(SvgIcons.settings(20, 20));
-        this.closeIcon = this.sanitizer.bypassSecurityTrustHtml(SvgIcons.close(24, 24));
-        
+        this.closeIcon = this.sanitizer.bypassSecurityTrustHtml(
+            SvgIcons.close(24, 24),
+        );
+
         effect(() => {
             const container = this.editorContainer();
             const monacoInstance = this.monaco();
             const hasCode = this.hasCodeUploaded();
             const pending = this.pendingContent();
-            
-            if (monacoInstance && container?.nativeElement && !this.editorInstance) {
+
+            if (
+                monacoInstance &&
+                container?.nativeElement &&
+                !this.editorInstance
+            ) {
                 if (hasCode || pending !== null) {
                     this.initEditor();
                 } else if (this.isMonacoLoading()) {
@@ -90,8 +126,13 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         effect(() => {
             const content = this.editorContent();
             const loaded = this.loadedEditedContent();
-            
-            if (this.hasCodeUploaded() && loaded !== null && content !== loaded && this._currentAttachmentId()) {
+
+            if (
+                this.hasCodeUploaded() &&
+                loaded !== null &&
+                content !== loaded &&
+                this._currentAttachmentId()
+            ) {
                 this.scheduleAutoSave();
             }
         });
@@ -115,10 +156,10 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
             this.isMonacoLoading.set(true);
             const monacoInstance = await loader.init();
             this.monaco.set(monacoInstance);
-            
+
             const container = this.editorContainer()?.nativeElement;
             const hasCode = this.hasCodeUploaded();
-            
+
             if (container && !hasCode && this.pendingContent() === null) {
                 this.isMonacoLoading.set(false);
             }
@@ -151,9 +192,8 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
 
         try {
             const pending = this.pendingContent();
-            const initialContent = pending !== null 
-                ? pending 
-                : (this.editorContent() || '');
+            const initialContent =
+                pending !== null ? pending : this.editorContent() || '';
 
             this.editorInstance = monacoInstance.editor.create(container, {
                 value: initialContent,
@@ -165,7 +205,7 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
                 minimap: { enabled: true },
                 scrollBeyondLastLine: false,
                 wordWrap: 'on',
-                lineNumbers: 'on'
+                lineNumbers: 'on',
             });
 
             this.editorInstance.onDidChangeModelContent(() => {
@@ -188,7 +228,6 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         }
     }
 
-
     public onSeeDiff(): void {
         this.showDiffModal.set(true);
     }
@@ -197,24 +236,71 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         this.showDiffModal.set(false);
     }
 
+    public async onMergeToOriginal(): Promise<void> {
+        const editedContent = this.editorContent();
+        this.originalContent.set(editedContent);
+        this.loadedEditedContent.set(editedContent);
+
+        if (this.editorInstance) {
+            this.editorInstance.setValue(editedContent);
+        }
+
+        if (this._currentAttachmentId()) {
+            await this.updateAttachmentWithMergedContent(editedContent);
+        }
+
+        this.showDiffModal.set(false);
+        this.toastService.show('Changes merged to original', 'success');
+    }
+
+    private async updateAttachmentWithMergedContent(
+        mergedContent: string,
+    ): Promise<void> {
+        const user = this.userStateService.user();
+        if (!user || !user.id) {
+            console.error('User not found');
+            return;
+        }
+
+        const request: SaveCodeAttachmentRequest = {
+            userId: user.id,
+            name: this.currentAttachmentName || 'untitled',
+            mimeType: this.currentAttachmentMimeType || 'text/plain',
+            codeLanguage: mapLanguageToCodeLanguage(this.selectedLanguage()),
+            originalData: mergedContent,
+            editedData: mergedContent,
+            diffHunks: [],
+        };
+
+        this.codeAttachmentsService
+            .update(this._currentAttachmentId()!, request)
+            .subscribe({
+                next: () => {
+                    this.loadedEditedContent.set(mergedContent);
+                },
+                error: (error) => {
+                    console.error('Error updating attachment:', error);
+                    this.toastService.show('Failed to merge changes', 'error');
+                },
+            });
+    }
+
     public hasDiff(): boolean {
-        return this.hasCodeUploaded() && this.originalContent() !== this.editorContent();
+        return (
+            this.hasCodeUploaded() &&
+            this.originalContent() !== this.editorContent()
+        );
     }
 
     public loadAttachment(attachment: CodeAttachment): void {
-        console.log('loadAttachment called with:', attachment);
-        
         if (!attachment.originalData || !attachment.editedData) {
-            console.error('Attachment data is missing:', {
-                hasOriginal: !!attachment.originalData,
-                hasEdited: !!attachment.editedData
-            });
+            console.error('Attachment data is missing');
             return;
         }
 
         const language = mapCodeLanguageToLanguage(attachment.codeLanguage);
         this.selectedLanguage.set(language);
-        
+
         this.originalContent.set(attachment.originalData);
         this.loadedEditedContent.set(attachment.editedData);
         this.editorContent.set(attachment.editedData);
@@ -223,63 +309,146 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
         this.currentAttachmentName = attachment.name;
         this.currentAttachmentMimeType = attachment.mimeType;
 
-        console.log('Setting up editor content. Editor instance:', !!this.editorInstance);
-
         if (this.editorInstance) {
-            console.log('Editor instance exists, setting value');
             this.editorInstance.setValue(attachment.editedData);
-            const monacoInstance = this.monaco();
-            if (monacoInstance) {
-                const model = this.editorInstance.getModel();
-                if (model) {
-                    monacoInstance.editor.setModelLanguage(model, language);
-                }
-            }
+            this.setEditorLanguage(language);
         } else {
-            console.log('Editor instance not ready, setting pending content');
             this.pendingContent.set(attachment.editedData);
-            
+
             const monacoInstance = this.monaco();
             const container = this.editorContainer()?.nativeElement;
-            
+
             if (monacoInstance && container && !this.editorInstance) {
                 setTimeout(() => {
                     if (!this.editorInstance) {
-                        console.log('Initializing editor via setTimeout');
                         this.initEditor();
                     }
                 }, 50);
-            } else {
-                console.warn('Cannot initialize editor immediately, will wait for effect:', {
-                    hasMonaco: !!monacoInstance,
-                    hasContainer: !!container,
-                    hasInstance: !!this.editorInstance
-                });
+            }
+        }
+    }
+
+    public updateEditedData(newEditedData: string): void {
+        this.editorContent.set(newEditedData);
+        this.loadedEditedContent.set(newEditedData);
+        
+        if (this.editorInstance) {
+            this.editorInstance.setValue(newEditedData);
+        }
+    }
+
+    public getEditedData(): string {
+        return this.editorContent();
+    }
+
+    public getCodeLanguage(): string {
+        return this.selectedLanguage();
+    }
+
+    private setEditorLanguage(language: string): void {
+        const monacoInstance = this.monaco();
+        if (monacoInstance && this.editorInstance) {
+            const model = this.editorInstance.getModel();
+            if (model) {
+                monacoInstance.editor.setModelLanguage(model, language);
             }
         }
     }
 
     public onFormPrompt(): void {
-        console.log('Form a prompt clicked');
-        // TODO: Implement prompt formation logic
+        const user = this.userStateService.user();
+        const attachmentId = this._currentAttachmentId();
+
+        if (!user || !user.id) {
+            this.toastService.show(
+                'User not found. Please refresh the page and try again.',
+                'error',
+            );
+            return;
+        }
+
+        if (!attachmentId) {
+            this.toastService.show(
+                'No attachment found. Please upload code first.',
+                'error',
+            );
+            return;
+        }
+
+        this.isFormingPrompt.set(true);
+        this.codeAttachmentsService
+            .formPrompt(attachmentId, user.id)
+            .subscribe({
+                next: (result) => {
+                    this.systemPrompt.set(result.systemPrompt);
+                    this.userPrompt.set(result.userPrompt);
+                    this.showPromptModal.set(true);
+                    this.isFormingPrompt.set(false);
+                },
+                error: (error) => {
+                    console.error('Error forming prompt:', error);
+                    this.toastService.show('Failed to form prompt', 'error');
+                    this.isFormingPrompt.set(false);
+                },
+            });
     }
 
-    public onPromptSettingsClick(): void {
-        this.showPromptSettingsModal.set(true);
+    public closePromptModal(): void {
+        this.showPromptModal.set(false);
     }
 
-    public closePromptSettingsModal(): void {
-        this.showPromptSettingsModal.set(false);
+    public onAnalyse(systemPrompt: string): void {
+        const attachmentId = this.currentAttachmentId();
+        const user = this.userStateService.user();
+
+        if (!attachmentId || !user?.id) {
+            this.toastService.show(
+                'Необходимо выбрать файл для анализа',
+                'error',
+            );
+            return;
+        }
+
+        // Close prompt modal first
+        this.showPromptModal.set(false);
+        
+        // Start loading
+        this.isAnalyzing.set(true);
+
+        const request: AnalyseCodeRequest = {
+            systemPrompt: systemPrompt,
+        };
+
+        this.codeAttachmentsService
+            .analyse(attachmentId, user.id, request)
+            .subscribe({
+                next: (analysis) => {
+                    // Wait a bit for progress to complete, then close modal
+                    setTimeout(() => {
+                        this.isAnalyzing.set(false);
+                        // Emit to parent component instead of showing modal here
+                        this.analysisCompleted.emit(analysis);
+                        this.toastService.show('Анализ завершен успешно', 'success');
+                    }, 500);
+                },
+                error: (error) => {
+                    console.error('Ошибка при анализе кода:', error);
+                    this.isAnalyzing.set(false);
+                    this.toastService.show('Ошибка при анализе кода', 'error');
+                },
+            });
     }
+
 
     public async onFileSelected(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
-        
+
         if (!file) {
             return;
         }
 
+        this.isFileLoading.set(true);
         const reader = new FileReader();
         reader.onload = async (e) => {
             const content = e.target?.result as string;
@@ -298,13 +467,7 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
                 try {
                     this.editorInstance.setValue(content);
                     this.editorContent.set(content);
-                    const monacoInstance = this.monaco();
-                    if (monacoInstance) {
-                        const model = this.editorInstance.getModel();
-                        if (model) {
-                            monacoInstance.editor.setModelLanguage(model, detectedLanguage);
-                        }
-                    }
+                    this.setEditorLanguage(detectedLanguage);
                 } catch (error) {
                     console.error('Error setting editor value:', error);
                     this.pendingContent.set(content);
@@ -314,17 +477,22 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
                 this.editorContent.set(content);
             }
 
-            await this.createAttachment(file.name, file.type, content, detectedLanguage);
+            await this.createAttachment(
+                file.name,
+                file.type,
+                content,
+                detectedLanguage,
+            );
         };
-        
+
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
+            this.isFileLoading.set(false);
         };
 
         reader.readAsText(file);
         input.value = '';
     }
-
 
     public onLoadSampleClick(): void {
         this.showLoadSampleModal.set(true);
@@ -344,25 +512,24 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
 
         if (this.editorInstance) {
             this.editorInstance.setValue(sampleCode);
+            this.setEditorLanguage(language);
+        } else {
+            this.pendingContent.set(sampleCode);
             const monacoInstance = this.monaco();
-            if (monacoInstance) {
-                const model = this.editorInstance.getModel();
-                if (model) {
-                    monacoInstance.editor.setModelLanguage(model, language);
-                }
+            const container = this.editorContainer()?.nativeElement;
+            if (monacoInstance && container && !this.editorInstance) {
+                this.initEditor();
             }
-            } else {
-                this.pendingContent.set(sampleCode);
-                const monacoInstance = this.monaco();
-                const container = this.editorContainer()?.nativeElement;
-                if (monacoInstance && container && !this.editorInstance) {
-                    this.initEditor();
-                }
-            }
+        }
 
         const fileExtension = this.getFileExtensionForLanguage(language);
         const fileName = `sample.${fileExtension}`;
-        await this.createAttachment(fileName, 'text/plain', sampleCode, language);
+        await this.createAttachment(
+            fileName,
+            'text/plain',
+            sampleCode,
+            language,
+        );
         this.showLoadSampleModal.set(false);
     }
 
@@ -376,6 +543,8 @@ export class CodeEditorComponent implements OnInit, OnDestroy {
                 return this.getPythonSample();
             case 'java':
                 return this.getJavaSample();
+            case 'kotlin':
+                return this.getKotlinSample();
             case 'cpp':
                 return this.getCppSample();
             case 'csharp':
@@ -434,6 +603,17 @@ print(f'Result: {result}')`;
         int result = calculateSum(5, 3);
         System.out.println("Result: " + result);
     }
+}`;
+    }
+
+    private getKotlinSample(): string {
+        return `fun calculateSum(a: Int, b: Int): Int {
+    return a + b
+}
+
+fun main() {
+    val result = calculateSum(5, 3)
+    println("Result: $result")
 }`;
     }
 
@@ -530,17 +710,26 @@ version: 1.0.0
 description: Sample YAML`;
     }
 
-    private async createAttachment(fileName: string, mimeType: string, content: string, language: string): Promise<void> {
+    private async createAttachment(
+        fileName: string,
+        mimeType: string,
+        content: string,
+        language: string,
+    ): Promise<void> {
         const user = this.userStateService.user();
         if (!user || !user.id) {
-            console.error('User not found. Please make sure you are logged in.');
-            this.toastService.show('User not found. Please refresh the page and try again.', 'error');
+            console.error(
+                'User not found. Please make sure you are logged in.',
+            );
+            this.toastService.show(
+                'User not found. Please refresh the page and try again.',
+                'error',
+            );
             return;
         }
 
         const userId = user.id;
 
-        const diffData = this.calculateDiff(content, content);
         const request: SaveCodeAttachmentRequest = {
             userId: userId,
             name: fileName,
@@ -548,21 +737,25 @@ description: Sample YAML`;
             codeLanguage: mapLanguageToCodeLanguage(language),
             originalData: content,
             editedData: content,
-            diffData: diffData
+            diffHunks: [],
         };
 
-        try {
-            const attachment = await firstValueFrom(this.codeAttachmentsService.create(request));
-            this._currentAttachmentId.set(attachment.id);
-            this.currentAttachmentName = attachment.name;
-            this.currentAttachmentMimeType = attachment.mimeType;
-            this.loadedEditedContent.set(content);
-            this.attachmentCreated.emit();
-            this.toastService.show('File saved successfully', 'success');
-        } catch (error) {
-            console.error('Error creating attachment:', error);
-            this.toastService.show('Failed to save file', 'error');
-        }
+        this.codeAttachmentsService.create(request).subscribe({
+            next: (attachment) => {
+                this._currentAttachmentId.set(attachment.id);
+                this.currentAttachmentName = attachment.name;
+                this.currentAttachmentMimeType = attachment.mimeType;
+                this.loadedEditedContent.set(content);
+                this.attachmentCreated.emit();
+                this.toastService.show('File saved successfully', 'success');
+                this.isFileLoading.set(false);
+            },
+            error: (error) => {
+                console.error('Error creating attachment:', error);
+                this.toastService.show('Failed to save file', 'error');
+                this.isFileLoading.set(false);
+            },
+        });
     }
 
     private scheduleAutoSave(): void {
@@ -582,81 +775,67 @@ description: Sample YAML`;
 
         const user = this.userStateService.user();
         if (!user || !user.id) {
-            console.error('User not found. Please make sure you are logged in.');
-            this.toastService.show('User not found. Please refresh the page and try again.', 'error');
+            console.error(
+                'User not found. Please make sure you are logged in.',
+            );
+            this.toastService.show(
+                'User not found. Please refresh the page and try again.',
+                'error',
+            );
             return;
         }
 
         const userId = user.id;
+        const originalContent = this.originalContent();
+        const editedContent = this.editorContent();
 
-        const diffData = this.calculateDiff(this.originalContent(), this.editorContent());
+        const diffHunks = await calculateUnifiedDiff(
+            originalContent,
+            editedContent,
+        );
+
         const request: SaveCodeAttachmentRequest = {
             userId: userId,
             name: this.currentAttachmentName || 'untitled',
             mimeType: this.currentAttachmentMimeType || 'text/plain',
             codeLanguage: mapLanguageToCodeLanguage(this.selectedLanguage()),
-            originalData: this.originalContent(),
-            editedData: this.editorContent(),
-            diffData: diffData
+            originalData: originalContent,
+            editedData: editedContent,
+            diffHunks: diffHunks,
         };
 
-        try {
-            await firstValueFrom(this.codeAttachmentsService.update(this._currentAttachmentId()!, request));
-            this.loadedEditedContent.set(this.editorContent());
-            this.toastService.show('Changes saved', 'success');
-        } catch (error) {
-            console.error('Error updating attachment:', error);
-            this.toastService.show('Failed to save changes', 'error');
-        }
+        this.codeAttachmentsService
+            .update(this._currentAttachmentId()!, request)
+            .subscribe({
+                next: () => {
+                    this.loadedEditedContent.set(this.editorContent());
+                    this.toastService.show('Changes saved', 'success');
+                },
+                error: (error) => {
+                    console.error('Error updating attachment:', error);
+                    this.toastService.show('Failed to save changes', 'error');
+                },
+            });
     }
 
     private getFileExtensionForLanguage(language: string): string {
         const extensionMap: Record<string, string> = {
-            'typescript': 'ts',
-            'javascript': 'js',
-            'python': 'py',
-            'java': 'java',
-            'cpp': 'cpp',
-            'csharp': 'cs',
-            'go': 'go',
-            'rust': 'rs',
-            'html': 'html',
-            'css': 'css',
-            'json': 'json',
-            'yaml': 'yaml',
-            'plaintext': 'txt'
+            typescript: 'ts',
+            javascript: 'js',
+            python: 'py',
+            java: 'java',
+            kotlin: 'kt',
+            cpp: 'cpp',
+            csharp: 'cs',
+            go: 'go',
+            rust: 'rs',
+            html: 'html',
+            css: 'css',
+            json: 'json',
+            yaml: 'yaml',
+            plaintext: 'txt',
         };
 
         return extensionMap[language.toLowerCase()] || 'txt';
     }
-
-    private calculateDiff(original: string, edited: string): string {
-        if (original === edited) {
-            return '';
-        }
-
-        const originalLines = original.split('\n');
-        const editedLines = edited.split('\n');
-        const maxLength = Math.max(originalLines.length, editedLines.length);
-        let diff = '';
-
-        for (let i = 0; i < maxLength; i++) {
-            const originalLine = originalLines[i] || '';
-            const editedLine = editedLines[i] || '';
-
-            if (originalLine !== editedLine) {
-                if (originalLine) {
-                    diff += `- ${originalLine}\n`;
-                }
-                if (editedLine) {
-                    diff += `+ ${editedLine}\n`;
-                }
-            } else if (originalLine) {
-                diff += `  ${originalLine}\n`;
-            }
-        }
-
-        return diff.trim();
-    }
 }
-

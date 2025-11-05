@@ -4,14 +4,13 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CodeAttachmentMetadata } from '../../models/code-attachments/code-attachment-metadata.model';
 import { CodeAttachmentsService } from '../../services/code-attachments.service';
 import { SvgIcons } from '../../shared/svg-icons';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-attachments-panel',
     standalone: true,
     imports: [CommonModule],
     templateUrl: './attachments-panel.component.html',
-    styleUrl: './attachments-panel.component.scss'
+    styleUrl: './attachments-panel.component.scss',
 })
 export class AttachmentsPanelComponent {
     public readonly attachments = input.required<CodeAttachmentMetadata[]>();
@@ -28,13 +27,17 @@ export class AttachmentsPanelComponent {
     public hoveredAttachmentId: string | null = null;
 
     constructor() {
-        this.removeIcon = this.sanitizer.bypassSecurityTrustHtml(SvgIcons.remove(16, 16));
+        this.removeIcon = this.sanitizer.bypassSecurityTrustHtml(
+            SvgIcons.remove(16, 16),
+        );
         this.updateChevronIcon();
     }
 
     private updateChevronIcon(): void {
         this.chevronIcon = this.sanitizer.bypassSecurityTrustHtml(
-            this.isCollapsed ? SvgIcons.chevronRight(16, 16) : SvgIcons.chevronDown(16, 16)
+            this.isCollapsed
+                ? SvgIcons.chevronRight(16, 16)
+                : SvgIcons.chevronDown(16, 16),
         );
     }
 
@@ -47,20 +50,25 @@ export class AttachmentsPanelComponent {
         this.onAttachmentSelected.emit(attachment);
     }
 
-    public async onRemoveClick(event: Event, attachment: CodeAttachmentMetadata): Promise<void> {
+    public onRemoveClick(
+        event: Event,
+        attachment: CodeAttachmentMetadata,
+    ): void {
         event.stopPropagation();
-        
+
         if (!confirm(`Are you sure you want to delete "${attachment.name}"?`)) {
             return;
         }
 
-        try {
-            await firstValueFrom(this.codeAttachmentsService.delete(attachment.id));
-            this.onAttachmentsChanged.emit();
-        } catch (error) {
-            console.error('Error deleting attachment:', error);
-            alert('Failed to delete attachment. Please try again.');
-        }
+        this.codeAttachmentsService.delete(attachment.id).subscribe({
+            next: () => {
+                this.onAttachmentsChanged.emit();
+            },
+            error: (error) => {
+                console.error('Error deleting attachment:', error);
+                alert('Failed to delete attachment. Please try again.');
+            },
+        });
     }
 
     public onItemMouseEnter(attachmentId: string): void {
@@ -71,4 +79,3 @@ export class AttachmentsPanelComponent {
         this.hoveredAttachmentId = null;
     }
 }
-

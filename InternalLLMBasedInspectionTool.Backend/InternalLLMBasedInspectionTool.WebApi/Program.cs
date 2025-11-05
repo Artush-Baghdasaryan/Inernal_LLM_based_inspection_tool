@@ -1,5 +1,7 @@
 using InternalLLMBasedInspectionTool.Application.Analysis;
 using InternalLLMBasedInspectionTool.Application.CodeAttachments;
+using InternalLLMBasedInspectionTool.Application.Integrations.AI;
+using InternalLLMBasedInspectionTool.Application.Integrations.AI.Models;
 using InternalLLMBasedInspectionTool.Application.Users;
 using InternalLLMBasedInspectionTool.Domain.Analysis;
 using InternalLLMBasedInspectionTool.Domain.CodeAttachments;
@@ -40,9 +42,13 @@ MongoDbDataContext.ConfigureData();
 #endregion
 
 #region Application
+builder.Services.Configure<AiServiceOptions>(
+    builder.Configuration.GetSection("AiServiceOptions"));
+    
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IAnalysisService, AnalysisService>();
 builder.Services.AddScoped<ICodeAttachmentsService, CodeAttachmentsService>();
+builder.Services.AddScoped<IAiClient, AiClient>();
 #endregion
 
 var app = builder.Build();

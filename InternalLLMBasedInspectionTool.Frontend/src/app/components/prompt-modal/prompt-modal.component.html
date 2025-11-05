@@ -1,0 +1,58 @@
+@if (isOpen()) {
+    <div class="modal-backdrop" (click)="onBackdropClick($event)">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">Analysis Prompt</h2>
+                <button
+                    aria-label="Close"
+                    class="close-button"
+                    [innerHTML]="closeIcon"
+                    (click)="closeModal()"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <div class="prompt-header">
+                        <h3 class="prompt-title">System Prompt</h3>
+                        <label class="readonly-checkbox">
+                            <input
+                                type="checkbox"
+                                [checked]="isReadonly()"
+                                (change)="isReadonly.set(!isReadonly())"
+                            />
+                            <span>Readonly</span>
+                        </label>
+                    </div>
+                    <textarea
+                        class="prompt-textarea system-prompt"
+                        [readonly]="isReadonly()"
+                        [value]="editableSystemPrompt()"
+                        (input)="editableSystemPrompt.set($any($event.target).value)"
+                        [class.readonly]="isReadonly()"
+                    ></textarea>
+                </div>
+                <div class="prompt-section">
+                    <div class="prompt-header">
+                        <h3 class="prompt-title">User Prompt (Diff)</h3>
+                    </div>
+                    <textarea
+                        class="prompt-textarea user-prompt"
+                        readonly
+                        [value]="userPrompt()"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="close-button-footer" (click)="closeModal()">
+                    Close
+                </button>
+                <button
+                    class="analyse-button"
+                    (click)="onAnalyseClick()"
+                >
+                    Analyse
+                </button>
+            </div>
+        </div>
+    </div>
+}

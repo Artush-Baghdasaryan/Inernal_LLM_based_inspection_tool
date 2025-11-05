@@ -11,5 +11,12 @@ public class AnalysisRepository : DataRepository<Analyse>, IAnalysisRepository {
     public Task<Analyse?> GetByAttachmentIdAsync(Guid attachmentId) {
         return FindOneAsync(a => a.AttachmentId == attachmentId);
     }
+
+    public async Task DeleteByAttachmentIdAsync(Guid attachmentId) {
+        var analysis = await GetByAttachmentIdAsync(attachmentId);
+        if (analysis != null) {
+            await DeleteAsync(analysis.Id);
+        }
+    }
 }
 

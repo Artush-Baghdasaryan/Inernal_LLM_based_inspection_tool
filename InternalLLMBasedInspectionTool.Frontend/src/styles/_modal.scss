@@ -1,0 +1,78 @@
+@use 'variables' as *;
+
+@mixin modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: $overlay-dark;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+@mixin modal-content($max-width: 600px) {
+  background: $bg-dark;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  width: 100%;
+  max-width: $max-width;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px $shadow-dark;
+}
+
+@mixin modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $white-90;
+    margin: 0;
+  }
+
+  .close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    color: $white-80;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $primary-10;
+      border-color: $primary-40;
+      color: $white;
+    }
+
+    &:active {
+      background: $primary-20;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+@mixin modal-body {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
