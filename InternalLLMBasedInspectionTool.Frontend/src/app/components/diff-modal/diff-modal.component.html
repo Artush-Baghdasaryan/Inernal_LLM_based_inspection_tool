@@ -3,12 +3,12 @@
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
                 <h2 class="modal-title">Code Diff</h2>
-                <button
-                    aria-label="Close"
-                    class="close-button"
-                    [innerHTML]="closeIcon"
-                    (click)="closeModal()"
-                ></button>
+                    <button
+                        aria-label="Close"
+                        class="close-button"
+                        [innerHTML]="closeIcon"
+                        (click)="closeModal()"
+                    ></button>
             </div>
             <div class="diff-editor-container">
                 <div class="diff-header">

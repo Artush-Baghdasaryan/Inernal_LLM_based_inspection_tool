@@ -1,9 +1,10 @@
-import { Component, input, output, inject } from '@angular/core';
+import { Component, input, output, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CodeAttachmentMetadata } from '../../models/code-attachments/code-attachment-metadata.model';
 import { CodeAttachmentsService } from '../../services/code-attachments.service';
 import { SvgIcons } from '../../shared/svg-icons';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-attachments-panel',
@@ -19,16 +20,18 @@ export class AttachmentsPanelComponent {
     public readonly onAttachmentsChanged = output<void>();
 
     private readonly codeAttachmentsService = inject(CodeAttachmentsService);
+    private readonly toastService = inject(ToastService);
     private readonly sanitizer = inject(DomSanitizer);
 
     public isCollapsed = true;
-    public readonly removeIcon: SafeHtml;
+    public readonly kebabMenuIcon: SafeHtml;
     public chevronIcon!: SafeHtml;
     public hoveredAttachmentId: string | null = null;
+    public openMenuId: string | null = null;
 
     constructor() {
-        this.removeIcon = this.sanitizer.bypassSecurityTrustHtml(
-            SvgIcons.remove(16, 16),
+        this.kebabMenuIcon = this.sanitizer.bypassSecurityTrustHtml(
+            SvgIcons.kebabMenu(16, 16),
         );
         this.updateChevronIcon();
     }
@@ -50,11 +53,43 @@ export class AttachmentsPanelComponent {
         this.onAttachmentSelected.emit(attachment);
     }
 
+    public onKebabMenuClick(
+        event: Event,
+        attachment: CodeAttachmentMetadata,
+    ): void {
+        event.stopPropagation();
+        
+        if (this.openMenuId === attachment.id) {
+            this.openMenuId = null;
+        } else {
+            this.openMenuId = attachment.id;
+        }
+    }
+
+    public onDownloadClick(
+        event: Event,
+        attachment: CodeAttachmentMetadata,
+    ): void {
+        event.stopPropagation();
+        this.openMenuId = null;
+
+        this.codeAttachmentsService.download(attachment.id, attachment.name).subscribe({
+            next: () => {
+                this.toastService.show('File downloaded successfully', 'success');
+            },
+            error: (error) => {
+                console.error('Error downloading attachment:', error);
+                this.toastService.show('Failed to download file', 'error');
+            },
+        });
+    }
+
     public onRemoveClick(
         event: Event,
         attachment: CodeAttachmentMetadata,
     ): void {
         event.stopPropagation();
+        this.openMenuId = null;
 
         if (!confirm(`Are you sure you want to delete "${attachment.name}"?`)) {
             return;
@@ -63,10 +98,11 @@ export class AttachmentsPanelComponent {
         this.codeAttachmentsService.delete(attachment.id).subscribe({
             next: () => {
                 this.onAttachmentsChanged.emit();
+                this.toastService.show('File deleted successfully', 'success');
             },
             error: (error) => {
                 console.error('Error deleting attachment:', error);
-                alert('Failed to delete attachment. Please try again.');
+                this.toastService.show('Failed to delete file', 'error');
             },
         });
     }
@@ -77,5 +113,17 @@ export class AttachmentsPanelComponent {
 
     public onItemMouseLeave(): void {
         this.hoveredAttachmentId = null;
+    }
+
+    public isMenuOpen(attachmentId: string): boolean {
+        return this.openMenuId === attachmentId;
+    }
+
+    @HostListener('document:click', ['$event'])
+    public onDocumentClick(event: MouseEvent): void {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.kebab-menu-container')) {
+            this.openMenuId = null;
+        }
     }
 }

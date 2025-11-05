@@ -99,4 +99,28 @@ export class CodeAttachmentsService {
             },
         );
     }
+
+    public download(id: string, fileName: string): Observable<void> {
+        return new Observable(observer => {
+            this.getById(id).subscribe({
+                next: (attachment) => {
+                    const data = attachment.editedData || attachment.originalData || '';
+                    const blob = new Blob([data], { type: attachment.mimeType || 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                    observer.next();
+                    observer.complete();
+                },
+                error: (error) => {
+                    observer.error(error);
+                }
+            });
+        });
+    }
 }

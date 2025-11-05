@@ -28,16 +28,34 @@
                             <span class="attachment-name">{{
                                 attachment.name
                             }}</span>
-                            <button
-                                class="remove-button"
-                                [class.visible]="
-                                    hoveredAttachmentId === attachment.id
-                                "
-                                aria-label="Remove"
-                                (click)="onRemoveClick($event, attachment)"
-                            >
-                                <div [innerHTML]="removeIcon"></div>
-                            </button>
+                            <div class="kebab-menu-container" [class.menu-open]="isMenuOpen(attachment.id)">
+                                <button
+                                    class="kebab-menu-button"
+                                    [class.visible]="
+                                        hoveredAttachmentId === attachment.id || isMenuOpen(attachment.id)
+                                    "
+                                    aria-label="Menu"
+                                    (click)="onKebabMenuClick($event, attachment)"
+                                >
+                                    <div [innerHTML]="kebabMenuIcon"></div>
+                                </button>
+                                @if (isMenuOpen(attachment.id)) {
+                                    <div class="dropdown-menu">
+                                        <button
+                                            class="menu-item"
+                                            (click)="onDownloadClick($event, attachment)"
+                                        >
+                                            <span class="menu-item-text">Download</span>
+                                        </button>
+                                        <button
+                                            class="menu-item menu-item-danger"
+                                            (click)="onRemoveClick($event, attachment)"
+                                        >
+                                            <span class="menu-item-text">Remove</span>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     }
                 </div>
