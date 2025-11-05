@@ -1,5 +1,7 @@
 # Internal LLM Based Inspection Tool
 
+Screen recording of app -> https://drive.google.com/file/d/1crLBA5qpvZtAK3FduwsXbMy4QvzIXT8R/view?usp=sharing 
+
 A tool that helps you find and fix problems in your code using AI.
 
 **What it does:**
